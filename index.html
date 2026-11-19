@@ -1,0 +1,849 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Painel de Campanhas 2027</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..800&family=Figtree:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+  /* Layout: painel de uso diário em coluna única (até 1080px): contagem regressiva do próximo marco, faixa de status, agenda de hoje, cronograma e checklist */
+  :root {
+    --bg: #faf8f7; --surface: #ffffff; --ink: #1d1a19; --muted: #6b6461; --faint: #9a928e;
+    --line: #e7e2df; --grid: #efeae7; --brand: #b3232c;
+    --ph-plan: #ece7e4; --ph-plan-line: #c8c1bc; --ph-air: #ddd7d3; --ph-air-line: #7a726e; --ph-event: #3b3633;
+    --ok: #2e7a4d; --ok-soft: #e2f1e7; --warn: #9a5b00; --warn-soft: #fbefd9;
+    --crit: #c1272e; --crit-soft: #fbe4e4; --now: #2b5ea8; --now-soft: #e3ebf7;
+    --tip-bg: #1d1a19; --tip-ink: #ffffff; --tip-muted: #c8c1bc;
+    --display: "Archivo", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+    --body: "Figtree", ui-sans-serif, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+    --num: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+    --label: clamp(132px, 22vw, 200px);
+    --row-h: 28px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #151413; --surface: #1e1c1b; --ink: #efebe8; --muted: #a9a29d; --faint: #7b7470;
+      --line: #322e2c; --grid: #282524; --brand: #e0565e;
+      --ph-plan: #2e2b29; --ph-plan-line: #4d4845; --ph-air: #423d3a; --ph-air-line: #9b948f; --ph-event: #d9d3ce;
+      --ok: #5cc28a; --ok-soft: rgba(92, 194, 138, .16); --warn: #e2a64a; --warn-soft: rgba(226, 166, 74, .16);
+      --crit: #ff6b6b; --crit-soft: rgba(255, 107, 107, .16); --now: #7fa9ee; --now-soft: rgba(127, 169, 238, .16);
+      --tip-bg: #efebe8; --tip-ink: #1d1a19; --tip-muted: #5f5854;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #151413; --surface: #1e1c1b; --ink: #efebe8; --muted: #a9a29d; --faint: #7b7470;
+    --line: #322e2c; --grid: #282524; --brand: #e0565e;
+    --ph-plan: #2e2b29; --ph-plan-line: #4d4845; --ph-air: #423d3a; --ph-air-line: #9b948f; --ph-event: #d9d3ce;
+    --ok: #5cc28a; --ok-soft: rgba(92, 194, 138, .16); --warn: #e2a64a; --warn-soft: rgba(226, 166, 74, .16);
+    --crit: #ff6b6b; --crit-soft: rgba(255, 107, 107, .16); --now: #7fa9ee; --now-soft: rgba(127, 169, 238, .16);
+    --tip-bg: #efebe8; --tip-ink: #1d1a19; --tip-muted: #5f5854;
+    color-scheme: dark;
+  }
+  :root { --hatch: repeating-linear-gradient(135deg, var(--ph-air-line) 0 1.5px, var(--ph-plan) 1.5px 5px); }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg); color: var(--ink);
+    font: 14px/1.45 var(--body);
+    padding-block: 28px 40px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; display: flex; flex-direction: column; gap: 28px; }
+  h1, h2 { font-family: var(--display); font-stretch: 85%; text-wrap: balance; margin: 0; }
+  h2 { font-size: 19px; font-weight: 700; letter-spacing: -.005em; }
+  .num { font-family: var(--num); font-variant-numeric: tabular-nums; }
+  .eyebrow { font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+  .eyebrow b { color: var(--brand); font-weight: 700; }
+  button, input { font: inherit; color: inherit; }
+
+  /* Header */
+  header { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 18px 28px; align-items: end; }
+  header .titles { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+  h1 { font-size: clamp(28px, 4.2vw, 40px); font-weight: 800; letter-spacing: -.015em; line-height: 1.02; }
+  .today { color: var(--muted); font-size: 14.5px; }
+  .today strong { color: var(--ink); font-weight: 600; }
+  .cycle { display: flex; align-items: center; gap: 10px; margin-top: 6px; font-size: 12px; color: var(--muted); }
+  .cycle .bar { flex: 1; max-width: 320px; height: 6px; border-radius: 3px; background: var(--line); overflow: hidden; }
+  .cycle .bar i { display: block; height: 100%; background: var(--ink); border-radius: 3px; }
+  .next {
+    display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 2px 14px; align-items: center;
+    padding: 14px 18px; border-radius: 12px; background: var(--surface); border: 1px solid var(--line); max-width: 420px;
+  }
+  .next .d { grid-row: span 2; font-family: var(--num); font-weight: 600; font-size: 30px; line-height: 1; color: var(--brand); letter-spacing: -.02em; }
+  .next .k { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+  .next .v { font-weight: 600; font-size: 14.5px; min-width: 0; }
+  .next .v span { display: block; font-weight: 400; color: var(--muted); font-size: 13px; }
+
+  /* Toolbar + stats */
+  .toolbar { display: flex; flex-wrap: wrap; gap: 12px 22px; align-items: center; justify-content: space-between; }
+  .seg-ctrl { display: inline-flex; border: 1px solid var(--line); border-radius: 9px; padding: 2px; background: var(--surface); }
+  .seg-ctrl button { border: 0; background: none; padding: 6px 12px; border-radius: 7px; font-size: 13px; color: var(--muted); cursor: pointer; transition: background .15s, color .15s; }
+  .seg-ctrl button[aria-pressed="true"] { background: var(--ink); color: var(--bg); font-weight: 600; }
+  .seg-ctrl button:focus-visible { outline: 2px solid var(--now); outline-offset: 2px; }
+  .stats { display: flex; flex-wrap: wrap; gap: 8px; }
+  .stat { display: inline-flex; align-items: baseline; gap: 7px; padding: 6px 11px; border-radius: 999px; font-size: 13px; border: 1px solid var(--line); background: var(--surface); color: var(--muted); }
+  .stat b { font-family: var(--num); font-weight: 600; color: var(--ink); }
+  .stat.crit { background: var(--crit-soft); border-color: transparent; color: var(--crit); }
+  .stat.crit b { color: var(--crit); }
+  .stat.now { background: var(--now-soft); border-color: transparent; color: var(--now); }
+  .stat.now b { color: var(--now); }
+  .stat.ok b { color: var(--ok); }
+  .sync { font-size: 12px; color: var(--faint); }
+  .sync.warn { color: var(--warn); }
+
+  section { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+  .sec-head { display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: baseline; justify-content: space-between; }
+  .sec-head p { margin: 0; color: var(--muted); font-size: 13px; }
+
+  /* Status pills */
+  .pill { display: inline-flex; align-items: center; gap: 6px; padding: 2px 9px; border-radius: 999px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .pill::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex: none; }
+  .pill.done { color: var(--ok); background: var(--ok-soft); }
+  .pill.late { color: var(--crit); background: var(--crit-soft); }
+  .pill.now { color: var(--now); background: var(--now-soft); }
+  .pill.soon { color: var(--warn); background: var(--warn-soft); }
+  .pill.wait { color: var(--muted); background: var(--grid); }
+  .pill.done::before { content: "✓"; width: auto; height: auto; background: none; font-size: 11px; }
+  .pill.late::before { content: "!"; width: auto; height: auto; background: none; font-size: 12px; font-weight: 800; }
+
+  /* Checkbox */
+  .check { display: flex; align-items: flex-start; gap: 10px; cursor: pointer; min-width: 0; }
+  .check input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+  .check .box {
+    flex: none; width: 20px; height: 20px; border-radius: 6px; border: 1.5px solid var(--ph-plan-line);
+    background: var(--surface); display: grid; place-items: center; margin-top: 1px;
+    transition: background .15s, border-color .15s, transform .12s;
+  }
+  .check .box::after { content: ""; width: 10px; height: 5px; border-left: 2px solid var(--bg); border-bottom: 2px solid var(--bg); transform: rotate(-45deg) translate(1px, -1px); opacity: 0; transition: opacity .12s; }
+  .check input:checked + .box { background: var(--ok); border-color: var(--ok); }
+  .check input:checked + .box::after { opacity: 1; }
+  .check:hover .box { border-color: var(--ink); }
+  .check input:focus-visible + .box { outline: 2px solid var(--now); outline-offset: 2px; }
+  .check input:disabled + .box { opacity: .5; }
+  .check.ro { cursor: default; }
+  .check.ro:hover .box { border-color: var(--ph-plan-line); }
+  .check.busy .box { transform: scale(.88); }
+
+  /* Agenda */
+  .agenda { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); overflow: hidden; }
+  .item { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 16px; align-items: center; padding: 12px 16px; border-top: 1px solid var(--line); }
+  .item:first-child { border-top: 0; }
+  .item.is-late { box-shadow: inset 3px 0 0 var(--crit); }
+  .item .what { font-weight: 600; }
+  .item .what span { font-weight: 400; color: var(--muted); }
+  .item .when { display: flex; align-items: center; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }
+  .item .date { font-family: var(--num); font-size: 12.5px; color: var(--muted); }
+  .empty { padding: 18px 16px; color: var(--muted); }
+
+  /* Timeline */
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 16px; list-style: none; margin: 0; padding: 0; font-size: 12px; color: var(--muted); }
+  .legend li { display: inline-flex; align-items: center; gap: 7px; }
+  .sw { width: 18px; height: 10px; border-radius: 5px; flex: none; }
+  .sw.plan { background: var(--ph-plan); box-shadow: inset 0 0 0 1px var(--ph-plan-line); }
+  .sw.pre { background: var(--hatch); box-shadow: inset 0 0 0 1px var(--ph-air-line); border-radius: 3px; }
+  .sw.air { background: var(--ph-air); box-shadow: inset 0 0 0 1.25px var(--ph-air-line); }
+  .sw.event { background: var(--ph-event); border-radius: 3px; }
+  .sw.done { background: var(--ok); }
+  .sw.late { background: var(--crit-soft); box-shadow: inset 0 0 0 1.5px var(--crit); }
+  .sw.today { height: 0; border-top: 1.5px dashed var(--brand); border-radius: 0; }
+  .gantt-wrap { border: 1px solid var(--line); border-radius: 12px; background: var(--surface); padding: 12px 14px 10px 6px; }
+  .rowgrid { display: grid; grid-template-columns: var(--label) minmax(0, 1fr); align-items: center; }
+  .head .track { height: 36px; background: none; }
+  .yr, .mo { position: absolute; white-space: nowrap; font-size: 11px; }
+  .yr { top: 0; font-weight: 700; color: var(--ink); font-family: var(--num); }
+  .mo { top: 17px; transform: translateX(-50%); color: var(--muted); }
+  .mo .short { display: none; }
+  .axisline { position: absolute; left: 0; right: 0; bottom: 0; border-bottom: 1px solid var(--line); }
+  .row { border-radius: 6px; transition: opacity .18s ease, background-color .18s ease; }
+  .row.on { background: var(--grid); }
+  .gantt.dim .row:not(.on) { opacity: .35; }
+  .name { display: flex; align-items: center; gap: 6px; min-width: 0; padding: 0 12px 0 8px; font-size: 13px; white-space: nowrap; }
+  .name .txt { overflow: hidden; text-overflow: ellipsis; }
+  .prio { flex: none; font-size: 10.5px; line-height: 16px; padding: 0 5px; border-radius: 4px; background: var(--grid); color: var(--muted); font-weight: 700; font-family: var(--num); }
+  .track { position: relative; height: var(--row-h); background: var(--gridbg); }
+  .seg { position: absolute; top: 50%; height: 12px; transform: translateY(-50%); border-radius: 6px; min-width: 5px; cursor: pointer; transition: opacity .18s, background-color .2s, box-shadow .2s; }
+  .seg::before { content: ""; position: absolute; inset: -8px -2px; }
+  .seg.plan { background: var(--ph-plan); box-shadow: inset 0 0 0 1px var(--ph-plan-line); }
+  .seg.pre { background: var(--hatch); box-shadow: inset 0 0 0 1px var(--ph-air-line); border-radius: 3px; }
+  .seg.air { background: var(--ph-air); box-shadow: inset 0 0 0 1.25px var(--ph-air-line); }
+  .seg.event { background: var(--ph-event); border-radius: 3px; }
+  .seg.single { width: 11px; height: 11px; min-width: 0; border-radius: 2px; background: var(--ph-event); transform: translate(-50%, -50%) rotate(45deg); }
+  .seg.st-done { background: var(--ok); box-shadow: none; }
+  .seg.st-late { background: var(--crit-soft); box-shadow: inset 0 0 0 1.5px var(--crit); }
+  .seg.single.st-late { background: var(--crit); }
+  .seg:hover, .seg:focus-visible, .seg.active { outline: 2px solid var(--ink); outline-offset: 2px; z-index: 3; }
+  .seg:focus { outline: none; }
+  .seg:focus-visible { outline: 2px solid var(--ink); }
+  .todayline { position: absolute; top: 0; bottom: 0; width: 0; border-left: 1.5px dashed var(--brand); pointer-events: none; z-index: 1; }
+  .foot .track { height: 20px; background: none; }
+  .todaytag { position: absolute; top: 3px; font-size: 11px; font-weight: 700; color: var(--brand); white-space: nowrap; transform: translateX(-50%); font-family: var(--num); }
+
+  /* Checklist */
+  .months { display: flex; flex-direction: column; gap: 22px; }
+  .month h3 { margin: 0 0 8px; font-family: var(--display); font-stretch: 85%; font-size: 15px; font-weight: 700; color: var(--muted); letter-spacing: .02em; text-transform: uppercase; }
+  .cards { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); overflow: hidden; }
+  .camp { display: grid; grid-template-columns: minmax(180px, 240px) minmax(0, 1fr); gap: 10px 20px; padding: 14px 16px; border-top: 1px solid var(--line); }
+  .camp:first-child { border-top: 0; }
+  .camp .meta { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+  .camp .meta .t { font-weight: 600; font-size: 14.5px; display: flex; align-items: center; gap: 7px; }
+  .camp .meta .s { color: var(--muted); font-size: 12.5px; }
+  .phases { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px 16px; min-width: 0; }
+  .ph { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  .ph .lbl { font-size: 13px; font-weight: 500; }
+  .ph .sub { font-size: 12px; color: var(--muted); }
+  .ph .sub .num { font-size: 11.5px; }
+  .ph .by { font-size: 11.5px; color: var(--ok); }
+  .ph .pill { align-self: flex-start; }
+
+  .tip { position: fixed; z-index: 20; max-width: 290px; padding: 9px 11px; border-radius: 8px; background: var(--tip-bg); color: var(--tip-ink); font-size: 12px; line-height: 1.45; box-shadow: 0 8px 22px rgba(0, 0, 0, .2); pointer-events: none; opacity: 0; transform: translateY(4px); transition: opacity .12s, transform .12s; }
+  .tip.show { opacity: 1; transform: none; }
+  .tip .v { font-size: 13.5px; font-weight: 600; font-family: var(--num); }
+  .tip .p { margin-top: 2px; }
+  .tip .m { color: var(--tip-muted); margin-top: 4px; }
+
+  .note { margin: 0; color: var(--faint); font-size: 12px; }
+  .ro-note { font-size: 12.5px; color: var(--muted); padding: 8px 12px; border-radius: 8px; background: var(--grid); display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+  .ro-note[hidden] { display: none; }
+  .ro-note button, .login button { font: 600 13px var(--body); padding: 7px 14px; border-radius: 8px; border: 0; background: var(--brand); color: #fff; cursor: pointer; }
+  .ro-note .link { background: none; color: var(--muted); padding: 0; text-decoration: underline; font-weight: 500; }
+  .login { position: fixed; inset: 0; z-index: 30; display: grid; place-items: center; padding: 16px; background: rgba(0,0,0,.45); }
+  .login[hidden] { display: none; }
+  .login form { width: min(380px, 100%); background: var(--surface); color: var(--ink); border-radius: 14px; padding: 22px; display: grid; gap: 12px; box-shadow: 0 18px 50px rgba(0,0,0,.3); }
+  .login h2 { margin: 0; font: 700 20px var(--display); }
+  .login p { margin: 0; font-size: 13px; color: var(--muted); }
+  .login label { display: grid; gap: 5px; font-size: 13px; font-weight: 600; }
+  .login input { font: 15px var(--body); padding: 9px 11px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); }
+  .login .err { color: var(--crit); font-size: 12.5px; min-height: 1em; }
+  .login .row { display: flex; gap: 10px; justify-content: flex-end; }
+  .login .ghost { background: none; color: var(--muted); }
+
+  @media (max-width: 720px) {
+    header { grid-template-columns: 1fr; }
+    .next { max-width: none; }
+    .camp { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 560px) {
+    :root { --label: 0px; --row-h: 20px; }
+    .rowgrid { grid-template-columns: minmax(0, 1fr); }
+    .rowgrid > .name:empty { display: none; }
+    .name { padding: 6px 0 0 4px; font-size: 12.5px; }
+    .gantt-wrap { padding: 10px 10px 8px; }
+    .item { grid-template-columns: 1fr; }
+    .item .when { justify-content: flex-start; padding-left: 30px; }
+  }
+  @media (max-width: 440px) {
+    .mo .long { display: none; }
+    .mo .short { display: inline; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="titles">
+      <div class="eyebrow"><b>60</b> Minutos Escape Game · Mapa Sazonal 2027</div>
+      <h1>Painel de Campanhas 2027</h1>
+      <div class="today" id="today">Carregando a data de hoje…</div>
+      <div class="cycle"><span id="cycle-label">Ciclo de planejamento</span><span class="bar" aria-hidden="true"><i id="cycle-bar" style="width:0%"></i></span><span class="num" id="cycle-pct"></span></div>
+    </div>
+    <div class="next" id="next" aria-live="polite">
+      <div class="d" id="next-d">D-0</div>
+      <div class="k">Próximo marco</div>
+      <div class="v" id="next-v">—</div>
+    </div>
+  </header>
+
+  <div class="toolbar">
+    <div class="seg-ctrl" role="group" aria-label="Quais campanhas mostrar">
+      <button type="button" id="view-a" data-view="a" aria-pressed="true">Prioridade A</button>
+      <button type="button" id="view-all" data-view="all" aria-pressed="false">Todas as datas</button>
+    </div>
+    <div class="stats" id="stats"></div>
+  </div>
+  <div class="sync" id="sync">Conectando às marcações do time…</div>
+  <div class="ro-note" id="ro-note" hidden><span id="ro-text">Você está vendo em modo leitura. Entre com seu nome e a senha do time para marcar as etapas.</span><button type="button" id="btn-login">Entrar para marcar</button></div>
+
+  <section aria-labelledby="h-hoje">
+    <div class="sec-head">
+      <h2 id="h-hoje">Para hoje</h2>
+      <p>Atrasos, etapas em andamento e prazos dos próximos 14 dias.</p>
+    </div>
+    <div class="agenda" id="agenda"></div>
+  </section>
+
+  <section aria-labelledby="h-crono">
+    <div class="sec-head">
+      <h2 id="h-crono">Cronograma</h2>
+      <ul class="legend" aria-label="Legenda">
+        <li><span class="sw plan"></span>Planejamento e criação</li>
+        <li><span class="sw pre"></span>Pré-venda</li>
+        <li><span class="sw air"></span>Campanha no ar</li>
+        <li><span class="sw event"></span>Evento</li>
+        <li><span class="sw done"></span>Feito</li>
+        <li><span class="sw late"></span>Atrasado</li>
+        <li><span class="sw today"></span>Hoje</li>
+      </ul>
+    </div>
+    <div class="gantt-wrap">
+      <div class="gantt" id="gantt">
+        <div class="rowgrid head"><div class="name"></div><div class="track" id="g-head"></div></div>
+        <div id="g-rows"></div>
+        <div class="rowgrid foot"><div class="name"></div><div class="track" id="g-foot"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-check">
+    <div class="sec-head">
+      <h2 id="h-check">Checklist por campanha</h2>
+      <p>Marque cada etapa quando ela for concluída. A marcação aparece para todo o time.</p>
+    </div>
+    <div class="months" id="months"></div>
+  </section>
+
+  <p class="note">Planejamento e criação começam em D-60 a partir do primeiro dia de cada período, ou D-90 nas campanhas com pré-venda (pré-venda em D-45). As datas e os prazos se atualizam sozinhos a cada dia.</p>
+</div>
+
+<div class="tip" id="tip" role="tooltip" aria-hidden="true"><div class="v"></div><div class="p"></div><div class="m"></div></div>
+<div class="login" id="login" hidden>
+  <form id="login-form" autocomplete="on">
+    <h2>Entrar no painel</h2>
+    <p>Seu nome aparece em cada etapa que você marcar. A senha do time é a mesma para todos.</p>
+    <label>Seu nome<input id="in-nome" name="nome" required maxlength="40" autocomplete="name"></label>
+    <label>Senha do time<input id="in-senha" name="senha" type="password" required autocomplete="current-password"></label>
+    <div class="err" id="login-err" role="alert"></div>
+    <div class="row"><button type="button" class="ghost" id="btn-cancel">Agora não</button><button type="submit" id="btn-enter">Entrar</button></div>
+  </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script>
+  // ======= CONFIGURAÇÃO DO SUPABASE (Project Settings > API) =======
+  window.PAINEL_CONFIG = {
+    SUPABASE_URL: "https://edigkrrvaukjuvxfmiml.supabase.co",
+    SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkaWdrcnJ2YXVranV2eGZtaW1sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTUxMTYwNzAsImV4cCI6MjExMDY5MjA3MH0.0X03RfUmgBUd_k2px2n44cMkrhMkmUMhwJztGcitr1o"
+  };
+</script>
+<script>
+(() => {
+  // [campanha, prioridade, produto, unidades, período, D-60/D-90, no ar, início, fim, pré-venda]
+  const RAW = [["Férias de janeiro 2027","A","Salas + Party","Todas","01 a 31/01 (mês inteiro)","2026-10-03","2026-12-02","2027-01-01","2027-01-31","2026-11-17"],["Carnaval","B","Salas","Todas","06 a 10/02 (sáb a qua)","2026-12-08","2027-01-16","2027-02-06","2027-02-10"],["Kick-off de equipes","B","Analysis","Todas","15/02 (seg)","2026-12-17","2027-01-16","2027-02-15","2027-02-15"],["Dia da Mulher","B","Analysis","Todas","08/03 (seg)","2027-01-07","2027-02-06","2027-03-08","2027-03-08"],["Dia do Consumidor","C","Salas","Todas","15/03 (seg)","2027-01-14","2027-03-08","2027-03-15","2027-03-15"],["Páscoa","A","Salas","Todas","26 a 28/03 (sex a dom)","2027-01-25","2027-03-05","2027-03-26","2027-03-28"],["Dia da Mentira","C","Salas","Todas","01/04 (qui)","2027-01-31","2027-03-25","2027-04-01","2027-04-01"],["Tiradentes e Brasília","B","Salas","DF","21/04 (qua)","2027-02-20","2027-03-31","2027-04-21","2027-04-21"],["Star Wars Day","C","Salas","Park Shopping","04/05 (ter)","2027-03-05","2027-04-27","2027-05-04","2027-05-04"],["Dia das Mães","A","Salas","Todas","09/05 (dom)","2027-03-10","2027-04-09","2027-05-09","2027-05-09"],["Dia do RH","B","Analysis","Todas","20/05 (qui) e 03/06 (qui)","2027-03-21","2027-04-20","2027-05-20","2027-05-20"],["Semana Nerd e Corpus Christi","B","Salas","Todas","25 a 30/05 (ter a dom)","2027-03-26","2027-05-04","2027-05-25","2027-05-30"],["Dia dos Namorados","A","Salas","Todas","12/06 (sáb)","2027-04-13","2027-05-22","2027-06-12","2027-06-12"],["Aniversário de Ribeirão Preto","C","Salas","Santa Úrsula","19/06 (sáb)","2027-04-20","2027-06-12","2027-06-19","2027-06-19"],["Copa do Mundo Feminina","B","Salas","Todas","24/06 a 25/07","2027-04-25","2027-06-03","2027-06-24","2027-07-25"],["Férias de julho","A","Salas + Party","Todas","01 a 31/07 (mês inteiro)","2027-04-02","2027-06-01","2027-07-01","2027-07-31","2027-05-17"],["Feriado de 9 de julho (SP)","C","Salas","Santa Úrsula","09 a 11/07 (sex a dom)","2027-05-10","2027-07-02","2027-07-09","2027-07-11"],["Dia do Amigo","B","Salas","Todas","20/07 (ter)","2027-05-21","2027-06-29","2027-07-20","2027-07-20"],["Aniversário do Harry Potter","C","Salas","Park Shopping","31/07 (sáb)","2027-06-01","2027-07-24","2027-07-31","2027-07-31"],["Dia dos Pais","A","Salas","Todas","06 a 08/08 (sex a dom)","2027-06-07","2027-07-07","2027-08-06","2027-08-08"],["Dia do Estudante","C","Salas","Todas","11/08 (qua)","2027-06-12","2027-08-04","2027-08-11","2027-08-11"],["Sexta-feira 13","A","Salas","Todas","13/08 (sex)","2027-06-14","2027-07-23","2027-08-13","2027-08-13"],["Dia do Gamer","C","Salas","Todas","29/08 (dom)","2027-06-30","2027-08-22","2027-08-29","2027-08-29"],["Aniversário 11 anos","A","Salas","Todas","01 a 30/09 (mês inteiro)","2027-07-03","2027-08-02","2027-09-01","2027-09-30"],["Independência","B","Salas","Todas","04 a 07/09 (sáb a ter)","2027-07-06","2027-08-14","2027-09-04","2027-09-07"],["Dia do Hobbit","C","Salas","Park Shopping e Santa Úrsula","22/09 (qua)","2027-07-24","2027-09-15","2027-09-22","2027-09-22"],["Dia das Crianças","A","Salas","Todas","09 a 12/10 (sáb a ter)","2027-08-10","2027-09-18","2027-10-09","2027-10-12"],["Dia do Servidor Público","B","Analysis","DF","28/10 (qui)","2027-08-29","2027-09-28","2027-10-28","2027-10-28"],["Halloween e Finados","A","Salas","Todas","29/10 a 02/11 (sex a ter)","2027-07-31","2027-10-08","2027-10-29","2027-11-02","2027-09-14"],["Stranger Things Day","B","Salas","Pier 21","06/11 (sáb)","2027-09-07","2027-10-16","2027-11-06","2027-11-06"],["Proclamação da República","C","Salas","Todas","13 a 15/11 (sáb a seg)","2027-09-14","2027-11-06","2027-11-13","2027-11-15"],["Black Friday","A","Salas","Todas","26 a 29/11 (sex a seg)","2027-09-27","2027-10-27","2027-11-26","2027-11-29"],["Confraternizações","A","Analysis","Todas","01 a 31/12 (mês inteiro)","2027-10-02","2027-11-01","2027-12-01","2027-12-31"],["Festas de turmas","B","Party","Todas","dezembro","2027-10-02","2027-11-01","2027-12-01","2027-12-31"],["Natal e recesso","A","Salas + Party","Todas","20 a 31/12","2027-10-21","2027-11-20","2027-12-20","2027-12-31"],["Férias de janeiro 2028","A","Salas + Party","Todas","01 a 31/01/2028 (mês inteiro)","2027-10-03","2027-12-02","2028-01-01","2028-01-31","2027-11-17"]];
+
+  const DAY = 864e5;
+  const slug = s => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  const add = (iso, n) => new Date(Date.parse(iso) + n * DAY).toISOString().slice(0, 10);
+  const diff = (a, b) => Math.round((Date.parse(b) - Date.parse(a)) / DAY);
+  const dm = iso => `${iso.slice(8, 10)}/${iso.slice(5, 7)}`;
+  const full = iso => `${dm(iso)}/${iso.slice(0, 4)}`;
+  const MONTHS = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
+  const MONTHS_LONG = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+
+  const CAMPAIGNS = RAW.map(([name, prio, product, units, period, plan, air, start, end, pre]) => {
+    const key = slug(name);
+    const phases = [{ id: "plan", label: "Planejamento e criação", kind: "work", start: plan, due: add(pre || air, -1), tag: pre ? "D-90" : "D-60" }];
+    if (pre) phases.push({ id: "pre", label: "Pré-venda aberta", kind: "milestone", start: pre, due: pre, tag: "D-45" });
+    phases.push({ id: "air", label: "Campanha no ar", kind: "milestone", start: air, due: air });
+    phases.push({ id: "event", label: "Evento realizado", kind: "period", start, due: end, end });
+    return { key, name, prio, product, units, period, plan, air, start, end, pre, phases };
+  });
+  const KNOWN = new Set(CAMPAIGNS.flatMap(c => c.phases.map(p => `${c.key}__${p.id}`)));
+
+  // ---- state
+  let view = "a";
+  try { if (localStorage.getItem("painel-view") === "all") view = "all"; } catch (e) {}
+  let marks = {};           // docId -> {feito, por, em}
+  let canWrite = false;     // true depois de entrar com a senha do time
+  let writeKnown = false;
+  let sb = null, session = null; // session = { nome, senha }
+  const pending = new Set();
+  let todayIso = localToday();
+
+  function localToday() {
+    const n = new Date();
+    return `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, "0")}-${String(n.getDate()).padStart(2, "0")}`;
+  }
+  const docId = (c, p) => `${c.key}__${p.id}`;
+  const isDone = (c, p) => !!(marks[docId(c, p)] && marks[docId(c, p)].feito);
+
+  // ---- status of one phase on a given day
+  function status(c, p) {
+    const t = todayIso;
+    if (isDone(c, p)) return { cls: "done", text: p.kind === "period" ? "Realizado" : (p.kind === "milestone" ? "Feito" : "Concluído"), rank: 9 };
+    if (p.kind === "work") {
+      if (t < p.start) { const n = diff(t, p.start); return { cls: n <= 14 ? "soon" : "wait", text: n === 1 ? "Começa amanhã" : `Começa em ${n} dias`, rank: 4, n }; }
+      if (t <= p.due) { const n = diff(t, p.due); return { cls: "now", text: n === 0 ? "Prazo termina hoje" : `Em andamento · faltam ${n} dias`, rank: 2, n }; }
+      const n = diff(p.due, t); return { cls: "late", text: n === 1 ? "Atrasado há 1 dia" : `Atrasado há ${n} dias`, rank: 0, n };
+    }
+    if (p.kind === "milestone") {
+      if (t < p.due) { const n = diff(t, p.due); return { cls: n <= 14 ? "soon" : "wait", text: n === 1 ? "É amanhã" : `Em ${n} dias`, rank: 3, n }; }
+      if (t === p.due) return { cls: "now", text: "É hoje", rank: 1, n: 0 };
+      const n = diff(p.due, t); return { cls: "late", text: n === 1 ? "Atrasado há 1 dia" : `Atrasado há ${n} dias`, rank: 0, n };
+    }
+    if (t < p.start) { const n = diff(t, p.start); return { cls: "wait", text: `Em ${n} dias`, rank: 5, n }; }
+    if (t <= p.end) return { cls: "now", text: "Acontecendo agora", rank: 2, n: 0 };
+    return { cls: "soon", text: "Aguardando baixa", rank: 1, n: 0 };
+  }
+  function dueText(p) {
+    if (p.kind === "work") return `${full(p.start)} a ${full(p.due)}`;
+    if (p.kind === "milestone") return `até ${full(p.due)}`;
+    return p.start === p.end ? full(p.start) : `${full(p.start)} a ${full(p.end)}`;
+  }
+
+  const visible = () => view === "all" ? CAMPAIGNS : CAMPAIGNS.filter(c => c.prio === "A");
+
+  // ---- header
+  function renderHeader() {
+    const [y, m, d] = todayIso.split("-").map(Number);
+    const long = new Intl.DateTimeFormat("pt-BR", { weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(new Date(y, m - 1, d));
+    const elToday = document.getElementById("today");
+    elToday.textContent = "";
+    const s = document.createElement("strong"); s.textContent = long.charAt(0).toUpperCase() + long.slice(1);
+    elToday.append(s);
+    const list = visible();
+    const first = list.reduce((a, c) => (!a || c.plan < a.plan ? c : a), null);
+    const c0 = first.plan, c1 = list.reduce((a, c) => (c.end > a ? c.end : a), "0000-01-01");
+    const total = diff(c0, c1) + 1;
+    const cycLabel = document.getElementById("cycle-label"), cycBar = document.getElementById("cycle-bar"), cycPct = document.getElementById("cycle-pct");
+    if (todayIso < c0) {
+      const n = diff(todayIso, c0);
+      cycLabel.textContent = `Faltam ${n} ${n === 1 ? "dia" : "dias"} para o início do ciclo (${first.name})`;
+      cycBar.style.width = "0%";
+      cycPct.textContent = full(c0);
+    } else {
+      const dayN = Math.min(diff(c0, todayIso) + 1, total);
+      const share = Math.round(dayN / total * 100);
+      cycLabel.textContent = `Dia ${dayN} de ${total} do ciclo`;
+      cycBar.style.width = `${share}%`;
+      cycPct.textContent = `${share}%`;
+    }
+
+    // next milestone among the visible campaigns: a planning start, the end of a planning already under way, or a dated milestone
+    let best = null;
+    const consider = (c, date, text) => { if (date >= todayIso && (!best || date < best.date)) best = { c, date, text }; };
+    list.forEach(c => c.phases.forEach(p => {
+      if (isDone(c, p) || p.kind === "period") return;
+      if (p.kind === "work") consider(c, todayIso < p.start ? p.start : p.due, todayIso < p.start ? `Começa o planejamento: ${c.name}` : `Fim do planejamento: ${c.name}`);
+      else consider(c, p.due, `${p.label}: ${c.name}`);
+    }));
+    const dEl = document.getElementById("next-d"), vEl = document.getElementById("next-v");
+    vEl.textContent = "";
+    if (!best) { dEl.textContent = "—"; vEl.textContent = "Nenhum prazo pendente"; return; }
+    const n = diff(todayIso, best.date);
+    dEl.textContent = n === 0 ? "Hoje" : n === 1 ? "1 dia" : `${n} dias`;
+    vEl.append(document.createTextNode(best.text));
+    const sp = document.createElement("span"); sp.textContent = full(best.date); vEl.append(sp);
+  }
+
+  // ---- stats
+  function renderStats() {
+    let late = 0, now = 0, soon = 0, done = 0, total = 0;
+    visible().forEach(c => c.phases.forEach(p => {
+      total++;
+      const st = status(c, p);
+      if (st.cls === "done") done++;
+      else if (st.cls === "late") late++;
+      else if (st.cls === "now") now++;
+      else if ((st.n ?? 99) <= 14 && st.rank !== 5) soon++;
+    }));
+    const el = document.getElementById("stats"); el.textContent = "";
+    const mk = (cls, n, label) => { const s = document.createElement("span"); s.className = `stat ${cls}`; const b = document.createElement("b"); b.textContent = n; s.append(b, document.createTextNode(label)); el.append(s); };
+    mk(late ? "crit" : "", late, late === 1 ? "atrasada" : "atrasadas");
+    mk(now ? "now" : "", now, "em andamento");
+    mk("", soon, "nos próximos 14 dias");
+    mk("ok", `${done}/${total}`, "etapas concluídas");
+  }
+
+  // ---- checkbox factory
+  function makeCheck(c, p, idPrefix) {
+    const id = `${idPrefix}-${c.key}-${p.id}`;
+    const lab = document.createElement("label");
+    lab.className = "check" + (canWrite ? "" : " ro") + (pending.has(docId(c, p)) ? " busy" : "");
+    lab.htmlFor = id;
+    const inp = document.createElement("input");
+    inp.type = "checkbox"; inp.id = id; inp.checked = isDone(c, p);
+    inp.disabled = !canWrite || pending.has(docId(c, p));
+    inp.setAttribute("aria-label", `${p.label} — ${c.name}`);
+    inp.addEventListener("change", () => toggle(c, p, inp.checked));
+    const box = document.createElement("span"); box.className = "box";
+    lab.append(inp, box);
+    return lab;
+  }
+
+  // ---- agenda
+  function renderAgenda() {
+    const el = document.getElementById("agenda"); el.textContent = "";
+    const rows = [];
+    visible().forEach(c => c.phases.forEach(p => {
+      const st = status(c, p);
+      if (st.cls === "done") return;
+      if (st.cls === "late" || st.cls === "now" || (st.cls === "soon")) rows.push({ c, p, st });
+    }));
+    rows.sort((a, b) => a.st.rank - b.st.rank || (a.p.due < b.p.due ? -1 : a.p.due > b.p.due ? 1 : 0));
+    if (!rows.length) {
+      const e = document.createElement("div"); e.className = "empty";
+      e.textContent = "Nada atrasado ou com prazo nos próximos 14 dias. O próximo marco está no topo da página.";
+      el.append(e); return;
+    }
+    rows.forEach(({ c, p, st }) => {
+      const it = document.createElement("div"); it.className = "item" + (st.cls === "late" ? " is-late" : "");
+      const lab = makeCheck(c, p, "ag");
+      const txt = document.createElement("div"); txt.className = "what";
+      txt.append(document.createTextNode(c.name));
+      const sp = document.createElement("span"); sp.textContent = ` · ${p.label}${p.tag ? ` (${p.tag})` : ""}`; txt.append(sp);
+      lab.append(txt);
+      const when = document.createElement("div"); when.className = "when";
+      const pill = document.createElement("span"); pill.className = `pill ${st.cls}`; pill.textContent = st.text;
+      const date = document.createElement("span"); date.className = "date"; date.textContent = dueText(p);
+      when.append(pill, date);
+      it.append(lab, when);
+      el.append(it);
+    });
+  }
+
+  // ---- gantt: the axis runs from the month of the earliest visible start (or of today, when earlier) to the month after the last event
+  let D0 = 0, D1 = 1;
+  const pct = iso => ((Date.parse(iso) - D0) / (D1 - D0)) * 100;
+  const gantt = document.getElementById("gantt");
+  const ym = (y, m) => `${y}-${String(m).padStart(2, "0")}-01`;
+  const nextMonth = (y, m) => (m === 12 ? [y + 1, 1] : [y, m + 1]);
+  function buildAxis(list) {
+    let lo = list.reduce((a, c) => (c.plan < a ? c.plan : a), "9999-12-31");
+    if (todayIso < lo) lo = todayIso;
+    const hi = list.reduce((a, c) => (c.end > a ? c.end : a), "0000-01-01");
+    const [hy, hm] = hi.split("-").map(Number);
+    const end = ym(...nextMonth(hy, hm));
+    let [y, m] = lo.split("-").map(Number);
+    const months = [];
+    while (ym(y, m) < end) {
+      const [ny, nm] = nextMonth(y, m);
+      months.push({ y, m, a: ym(y, m), b: ym(ny, nm) });
+      y = ny; m = nm;
+    }
+    D0 = Date.parse(months[0].a); D1 = Date.parse(end);
+    const head = document.getElementById("g-head");
+    head.textContent = "";
+    gantt.style.setProperty("--gridbg", months.map(mo => `linear-gradient(var(--grid), var(--grid)) ${pct(mo.a).toFixed(3)}% 0 / 1px 100% no-repeat`).concat(["linear-gradient(var(--grid), var(--grid)) 100% 0 / 1px 100% no-repeat"]).join(", "));
+    months.forEach((mo, i) => {
+      const lab = document.createElement("span"); lab.className = "mo"; lab.style.left = `${(pct(mo.a) + pct(mo.b)) / 2}%`;
+      const l = document.createElement("span"); l.className = "long"; l.textContent = MONTHS[mo.m - 1];
+      const s = document.createElement("span"); s.className = "short"; s.textContent = MONTHS[mo.m - 1][0];
+      lab.append(l, s); head.append(lab);
+      if (i === 0 || mo.m === 1) { const yr = document.createElement("span"); yr.className = "yr"; yr.style.left = `calc(${pct(mo.a)}% + 2px)`; yr.textContent = mo.y; head.append(yr); }
+    });
+    const ax = document.createElement("div"); ax.className = "axisline"; head.append(ax);
+  }
+
+  const tip = document.getElementById("tip");
+  let pinned = null;
+  function placeTip(x, y) {
+    const w = tip.offsetWidth, h = tip.offsetHeight, pad = 8;
+    let l = x + 14, t = y + 16;
+    if (l + w > innerWidth - pad) l = x - w - 14;
+    if (l < pad) l = pad;
+    if (t + h > innerHeight - pad) t = y - h - 12;
+    if (t < pad) t = pad;
+    tip.style.left = `${l}px`; tip.style.top = `${t}px`;
+  }
+  async function showTip(seg, x, y) {
+    const { c, p } = seg._ref;
+    const st = status(c, p);
+    tip.querySelector(".v").textContent = dueText(p);
+    tip.querySelector(".p").textContent = `${p.label}${p.tag ? ` (${p.tag})` : ""} · ${c.name}`;
+    const mk = marks[docId(c, p)];
+    let meta = `${st.text} · Prioridade ${c.prio} · ${c.product}`;
+    tip.querySelector(".m").textContent = meta;
+    tip.classList.add("show"); tip.setAttribute("aria-hidden", "false");
+    placeTip(x, y);
+    if (mk && mk.feito) {
+      const who = await whoName(mk.por);
+      if (tip.classList.contains("show")) tip.querySelector(".m").textContent = `${meta} · marcado por ${who}${mk.em ? ` em ${dm(mk.em.slice(0, 10))}` : ""}`;
+    }
+  }
+  function hideTip() {
+    tip.classList.remove("show"); tip.setAttribute("aria-hidden", "true");
+    if (pinned) { pinned.classList.remove("active"); pinned = null; }
+  }
+
+  function makeSeg(track, c, p, a, bExcl, kindClass, single) {
+    const seg = document.createElement("div");
+    const st = status(c, p);
+    seg.className = `seg ${single ? "single" : kindClass}` + (st.cls === "done" ? " st-done" : st.cls === "late" ? " st-late" : "");
+    seg.tabIndex = 0; seg.setAttribute("role", "img");
+    seg.setAttribute("aria-label", `${c.name}: ${p.label}, ${dueText(p)}, ${st.text}`);
+    seg._ref = { c, p };
+    const left = pct(a), w = pct(bExcl) - left;
+    if (single) seg.style.left = `${left + w / 2}%`;
+    else { seg.style.left = `${left}%`; seg.style.width = kindClass === "event" ? `${w}%` : `calc(${w}% - 2px)`; }
+    seg.addEventListener("pointerenter", e => { if (e.pointerType !== "touch") showTip(seg, e.clientX, e.clientY); });
+    seg.addEventListener("pointermove", e => { if (e.pointerType !== "touch" && !pinned) placeTip(e.clientX, e.clientY); });
+    seg.addEventListener("pointerleave", e => { if (e.pointerType !== "touch" && !pinned) hideTip(); });
+    seg.addEventListener("pointerdown", e => {
+      if (e.pointerType !== "touch") return;
+      e.stopPropagation();
+      if (pinned === seg) { hideTip(); return; }
+      hideTip(); pinned = seg; seg.classList.add("active");
+      const r = seg.getBoundingClientRect(); showTip(seg, r.left + r.width / 2, r.bottom);
+    });
+    seg.addEventListener("focus", () => { const r = seg.getBoundingClientRect(); showTip(seg, r.left + r.width / 2, r.bottom); });
+    seg.addEventListener("blur", hideTip);
+    track.append(seg);
+  }
+
+  function renderGantt() {
+    buildAxis(visible());
+    const rowsEl = document.getElementById("g-rows"); rowsEl.textContent = "";
+    const foot = document.getElementById("g-foot"); foot.textContent = "";
+    const tp = pct(todayIso) + (pct(add(todayIso, 1)) - pct(todayIso)) / 2;
+    const showToday = tp >= 0 && tp <= 100;
+    if (showToday) {
+      const tag = document.createElement("span"); tag.className = "todaytag"; tag.style.left = `${tp}%`;
+      if (tp < 5) tag.style.transform = "translateX(-6px)";
+      if (tp > 95) tag.style.transform = "translateX(calc(-100% + 6px))";
+      tag.textContent = `Hoje ${dm(todayIso)}`; foot.append(tag);
+    }
+    visible().forEach(c => {
+      const row = document.createElement("div"); row.className = "rowgrid row";
+      const name = document.createElement("div"); name.className = "name";
+      if (view === "all") { const ch = document.createElement("span"); ch.className = "prio"; ch.textContent = c.prio; name.append(ch); }
+      const t = document.createElement("span"); t.className = "txt"; t.textContent = c.name; t.title = c.name; name.append(t);
+      const track = document.createElement("div"); track.className = "track";
+      if (showToday) { const tl = document.createElement("div"); tl.className = "todayline"; tl.style.left = `${tp}%`; track.append(tl); }
+      const [plan, pre, air, ev] = [c.phases.find(p => p.id === "plan"), c.phases.find(p => p.id === "pre"), c.phases.find(p => p.id === "air"), c.phases.find(p => p.id === "event")];
+      makeSeg(track, c, plan, c.plan, c.pre || c.air, "plan");
+      if (pre) makeSeg(track, c, pre, c.pre, c.air, "pre");
+      makeSeg(track, c, air, c.air, c.start, "air");
+      makeSeg(track, c, ev, c.start, add(c.end, 1), "event", c.start === c.end);
+      row.append(name, track);
+      row.addEventListener("pointerenter", () => { gantt.classList.add("dim"); row.classList.add("on"); });
+      row.addEventListener("pointerleave", () => { gantt.classList.remove("dim"); row.classList.remove("on"); });
+      rowsEl.append(row);
+    });
+  }
+
+  // ---- checklist
+  let renderToken = 0;
+  async function renderChecklist() {
+    const token = ++renderToken;
+    const el = document.getElementById("months");
+    const ids = [...new Set(Object.values(marks).map(m => m.por).filter(Boolean))];
+    const profiles = {};
+    if (token !== renderToken) return;
+    el.textContent = "";
+    const groups = new Map();
+    visible().forEach(c => {
+      const k = c.start.slice(0, 7);
+      if (!groups.has(k)) groups.set(k, []);
+      groups.get(k).push(c);
+    });
+    [...groups.keys()].sort().forEach(k => {
+      const [y, m] = k.split("-").map(Number);
+      const sec = document.createElement("div"); sec.className = "month";
+      const h = document.createElement("h3"); h.textContent = `${MONTHS_LONG[m - 1]} ${y}`;
+      const cards = document.createElement("div"); cards.className = "cards";
+      groups.get(k).forEach(c => {
+        const card = document.createElement("div"); card.className = "camp";
+        const meta = document.createElement("div"); meta.className = "meta";
+        const t = document.createElement("div"); t.className = "t";
+        const ch = document.createElement("span"); ch.className = "prio"; ch.textContent = c.prio;
+        t.append(ch, document.createTextNode(c.name));
+        const s = document.createElement("div"); s.className = "s";
+        s.textContent = `${c.period} · ${c.product} · ${c.units === "Todas" ? "todas as unidades" : c.units}`;
+        meta.append(t, s);
+        const phs = document.createElement("div"); phs.className = "phases";
+        c.phases.forEach(p => {
+          const st = status(c, p);
+          const box = document.createElement("div"); box.className = "ph";
+          const lab = makeCheck(c, p, "ck");
+          const lt = document.createElement("span"); lt.className = "lbl"; lt.textContent = `${p.label}${p.tag ? ` (${p.tag})` : ""}`;
+          lab.append(lt);
+          const sub = document.createElement("div"); sub.className = "sub";
+          const num = document.createElement("span"); num.className = "num"; num.textContent = dueText(p);
+          sub.append(num);
+          const pill = document.createElement("span"); pill.className = `pill ${st.cls}`; pill.textContent = st.text;
+          box.append(lab, sub, pill);
+          const mk = marks[docId(c, p)];
+          if (mk && mk.feito) {
+            const by = document.createElement("div"); by.className = "by";
+            by.textContent = `Marcado por ${mk.por || "alguém do time"}${mk.em ? ` em ${dm(mk.em.slice(0, 10))}` : ""}`;
+            box.append(by);
+          }
+          phs.append(box);
+        });
+        card.append(meta, phs);
+        cards.append(card);
+      });
+      sec.append(h, cards);
+      el.append(sec);
+    });
+  }
+
+  async function whoName(name) { return name || "alguém do time"; }
+
+
+  function renderAll() {
+    renderHeader(); renderStats(); renderAgenda(); renderGantt(); renderChecklist();
+  }
+
+  function setSync(text, warn) {
+    const el = document.getElementById("sync");
+    el.textContent = text; el.classList.toggle("warn", !!warn);
+  }
+
+  // ---- view toggle
+  function setView(v) {
+    view = v;
+    try { localStorage.setItem("painel-view", v); } catch (e) {}
+    document.getElementById("view-a").setAttribute("aria-pressed", String(v === "a"));
+    document.getElementById("view-all").setAttribute("aria-pressed", String(v === "all"));
+    hideTip(); renderAll();
+  }
+  document.getElementById("view-a").addEventListener("click", () => setView("a"));
+  document.getElementById("view-all").addEventListener("click", () => setView("all"));
+  document.addEventListener("pointerdown", () => { if (pinned) hideTip(); });
+  addEventListener("scroll", () => { if (!pinned) hideTip(); }, { passive: true });
+
+  // ---- day rollover: recompute everything just after local midnight
+  function scheduleMidnight() {
+    const n = new Date();
+    const next = new Date(n.getFullYear(), n.getMonth(), n.getDate() + 1, 0, 0, 5);
+    setTimeout(() => { todayIso = localToday(); renderAll(); scheduleMidnight(); }, next - n);
+  }
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible" && localToday() !== todayIso) { todayIso = localToday(); renderAll(); }
+  });
+
+  // first paint without shared data
+  setView(view);
+  scheduleMidnight();
+
+
+  // ---- sessão (nome + senha do time, guardados neste navegador)
+  function loadSession() {
+    try { const s = JSON.parse(localStorage.getItem("painel-sessao") || "null"); if (s && s.nome && s.senha) return s; } catch (e) {}
+    return null;
+  }
+  function saveSession(s) { try { s ? localStorage.setItem("painel-sessao", JSON.stringify(s)) : localStorage.removeItem("painel-sessao"); } catch (e) {} }
+
+  function applyAccess() {
+    canWrite = !!(sb && session);
+    const ro = document.getElementById("ro-note");
+    const txt = document.getElementById("ro-text");
+    const btn = document.getElementById("btn-login");
+    if (!sb) { ro.hidden = true; }
+    else if (session) {
+      ro.hidden = false;
+      txt.textContent = `Marcando como ${session.nome}.`;
+      btn.textContent = "Sair"; btn.className = "link";
+    } else {
+      ro.hidden = false;
+      txt.textContent = "Você está vendo em modo leitura. Entre com seu nome e a senha do time para marcar as etapas.";
+      btn.textContent = "Entrar para marcar"; btn.className = "";
+    }
+    renderAll();
+  }
+
+  const loginEl = document.getElementById("login");
+  function openLogin() {
+    document.getElementById("login-err").textContent = "";
+    loginEl.hidden = false;
+    document.getElementById("in-nome").focus();
+  }
+  document.getElementById("btn-login").addEventListener("click", () => {
+    if (session) { session = null; saveSession(null); applyAccess(); } else openLogin();
+  });
+  document.getElementById("btn-cancel").addEventListener("click", () => { loginEl.hidden = true; });
+  loginEl.addEventListener("keydown", e => { if (e.key === "Escape") loginEl.hidden = true; });
+  document.getElementById("login-form").addEventListener("submit", async e => {
+    e.preventDefault();
+    const nome = document.getElementById("in-nome").value.trim();
+    const senha = document.getElementById("in-senha").value;
+    const err = document.getElementById("login-err");
+    const btn = document.getElementById("btn-enter");
+    if (!nome || !senha) return;
+    btn.disabled = true; err.textContent = "";
+    try {
+      const { data, error } = await sb.rpc("verificar_senha", { p_senha: senha });
+      if (error) throw error;
+      if (!data) { err.textContent = "Senha incorreta."; return; }
+      session = { nome, senha }; saveSession(session);
+      loginEl.hidden = true; applyAccess();
+    } catch (ex) {
+      err.textContent = "Não foi possível conferir a senha agora. Tente de novo.";
+    } finally { btn.disabled = false; }
+  });
+
+  // ---- writes
+  async function toggle(c, p, checked) {
+    const id = docId(c, p);
+    if (!sb || !canWrite || pending.has(id)) { renderAll(); return; }
+    pending.add(id); renderAll();
+    try {
+      const { data, error } = await sb.rpc("marcar_etapa", {
+        p_senha: session.senha, p_id: id, p_feito: checked,
+        p_por: session.nome, p_campanha: c.name, p_etapa: p.label
+      });
+      if (error) throw error;
+      if (data === false) {
+        session = null; saveSession(null);
+        setSync("A senha do time mudou. Entre de novo para continuar marcando.", true);
+        applyAccess(); return;
+      }
+      if (checked) marks[id] = { feito: true, por: session.nome, em: new Date().toISOString(), campanha: c.name, etapa: p.label };
+      else delete marks[id];
+      updateCount();
+    } catch (e) {
+      setSync("Não foi possível salvar agora. Confira a internet e tente de novo.", true);
+    } finally {
+      pending.delete(id); renderAll();
+    }
+  }
+
+  function updateCount() {
+    const n = Object.keys(marks).filter(k => KNOWN.has(k)).length;
+    setSync(`Marcações do time sincronizadas · ${n} ${n === 1 ? "etapa marcada" : "etapas marcadas"}`);
+  }
+
+  // ---- connect to Supabase
+  (async () => {
+    const cfg = window.PAINEL_CONFIG || {};
+    if (!window.supabase || !cfg.SUPABASE_URL || /COLE_AQUI/.test(cfg.SUPABASE_URL + cfg.SUPABASE_ANON_KEY)) {
+      setSync("Marcações desligadas: o painel ainda não foi ligado ao banco de dados. Datas e prazos já estão atualizados.", true);
+      return;
+    }
+    sb = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
+    session = loadSession();
+    applyAccess();
+
+    async function fetchAll() {
+      const { data, error } = await sb.from("marcacoes").select("id, feito, por, em, campanha, etapa");
+      if (error) throw error;
+      const next = {};
+      data.forEach(r => { if (r.feito) next[r.id] = r; });
+      marks = next; updateCount(); renderAll();
+    }
+    try { await fetchAll(); }
+    catch (e) { setSync("Não foi possível carregar as marcações agora. Recarregue a página mais tarde.", true); }
+
+    sb.channel("marcacoes-live")
+      .on("postgres_changes", { event: "*", schema: "public", table: "marcacoes" }, payload => {
+        if (payload.eventType === "DELETE") { delete marks[payload.old.id]; }
+        else if (payload.new && payload.new.feito) { marks[payload.new.id] = payload.new; }
+        else if (payload.new) { delete marks[payload.new.id]; }
+        updateCount(); renderAll();
+      })
+      .subscribe();
+
+    // ao voltar para a aba, recarrega para não perder nada
+    document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") fetchAll().catch(() => {}); });
+  })();
+})();
+</script>
+</body>
+</html>
