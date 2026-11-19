@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..800&family=Figtree:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap">
 <style>
-  /* Layout: painel de uso diário em coluna única (até 1080px): contagem regressiva do próximo marco, faixa de status, agenda de hoje, cronograma e checklist */
+  /* Layout: painel de uso diário em coluna única (90% da largura da tela): contagem regressiva do próximo marco, faixa de status, agenda de hoje, cronograma e checklist */
   :root {
     --bg: #faf8f7; --surface: #ffffff; --ink: #1d1a19; --muted: #6b6461; --faint: #9a928e;
     --line: #e7e2df; --grid: #efeae7; --brand: #b3232c;
@@ -46,14 +46,16 @@
 
   * { box-sizing: border-box; }
   body {
+    margin: 0;
     background: var(--bg); color: var(--ink);
     font: 14px/1.45 var(--body);
     padding-block: 28px 40px;
-    padding-left: max(16px, env(safe-area-inset-left, 0px));
-    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    /* respiro lateral: 5% de cada lado (10% da largura no total), nunca menos de 16px */
+    padding-left: max(16px, 5vw, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, 5vw, env(safe-area-inset-right, 0px));
     -webkit-font-smoothing: antialiased;
   }
-  .wrap { max-width: 1080px; margin: 0 auto; display: flex; flex-direction: column; gap: 28px; }
+  .wrap { width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: 28px; }
   h1, h2 { font-family: var(--display); font-stretch: 85%; text-wrap: balance; margin: 0; }
   h2 { font-size: 19px; font-weight: 700; letter-spacing: -.005em; }
   .num { font-family: var(--num); font-variant-numeric: tabular-nums; }
