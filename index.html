@@ -16,6 +16,7 @@
     --ok: #2e7a4d; --ok-soft: #e2f1e7; --warn: #9a5b00; --warn-soft: #fbefd9;
     --crit: #c1272e; --crit-soft: #fbe4e4; --now: #2b5ea8; --now-soft: #e3ebf7;
     --tip-bg: #1d1a19; --tip-ink: #ffffff; --tip-muted: #c8c1bc;
+    --f-brand: #6d4fc2; --f-brand-soft: #eee9fa; --f-sales: #0e7471; --f-sales-soft: #dff1f0;
     --display: "Archivo", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
     --body: "Figtree", ui-sans-serif, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
     --num: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
@@ -30,6 +31,7 @@
       --ok: #5cc28a; --ok-soft: rgba(92, 194, 138, .16); --warn: #e2a64a; --warn-soft: rgba(226, 166, 74, .16);
       --crit: #ff6b6b; --crit-soft: rgba(255, 107, 107, .16); --now: #7fa9ee; --now-soft: rgba(127, 169, 238, .16);
       --tip-bg: #efebe8; --tip-ink: #1d1a19; --tip-muted: #5f5854;
+      --f-brand: #b9a4f5; --f-brand-soft: rgba(185, 164, 245, .15); --f-sales: #5fcfc9; --f-sales-soft: rgba(95, 207, 201, .14);
       color-scheme: dark;
     }
   }
@@ -40,6 +42,7 @@
     --ok: #5cc28a; --ok-soft: rgba(92, 194, 138, .16); --warn: #e2a64a; --warn-soft: rgba(226, 166, 74, .16);
     --crit: #ff6b6b; --crit-soft: rgba(255, 107, 107, .16); --now: #7fa9ee; --now-soft: rgba(127, 169, 238, .16);
     --tip-bg: #efebe8; --tip-ink: #1d1a19; --tip-muted: #5f5854;
+    --f-brand: #b9a4f5; --f-brand-soft: rgba(185, 164, 245, .15); --f-sales: #5fcfc9; --f-sales-soft: rgba(95, 207, 201, .14);
     color-scheme: dark;
   }
   :root { --hatch: repeating-linear-gradient(135deg, var(--ph-air-line) 0 1.5px, var(--ph-plan) 1.5px 5px); }
@@ -152,6 +155,9 @@
   .sw.event { background: var(--ph-event); border-radius: 3px; }
   .sw.done { background: var(--ok); }
   .sw.late { background: var(--crit-soft); box-shadow: inset 0 0 0 1.5px var(--crit); }
+  .sw.dot-b, .sw.dot-v { width: 8px; height: 8px; border-radius: 50%; }
+  .sw.dot-b { background: var(--f-brand); }
+  .sw.dot-v { background: var(--f-sales); }
   .sw.today { height: 0; border-top: 1.5px dashed var(--brand); border-radius: 0; }
   .gantt-wrap { border: 1px solid var(--line); border-radius: 12px; background: var(--surface); padding: 12px 14px 10px 6px; }
   .rowgrid { display: grid; grid-template-columns: var(--label) minmax(0, 1fr); align-items: center; }
@@ -166,6 +172,14 @@
   .gantt.dim .row:not(.on) { opacity: .35; }
   .name { display: flex; align-items: center; gap: 6px; min-width: 0; padding: 0 12px 0 8px; font-size: 13px; white-space: nowrap; }
   .name .txt { overflow: hidden; text-overflow: ellipsis; }
+  .foco { flex: none; display: inline-flex; align-items: center; gap: 5px; font-size: 10.5px; line-height: 16px; padding: 0 6px; border-radius: 4px; font-weight: 700; letter-spacing: .02em; text-transform: uppercase; }
+  .foco::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  .foco.branding { color: var(--f-brand); background: var(--f-brand-soft); }
+  .foco.vendas { color: var(--f-sales); background: var(--f-sales-soft); }
+  .name .foco { padding: 0; width: 16px; justify-content: center; background: none; }
+  .name .foco::before { width: 8px; height: 8px; }
+  .name .foco span { display: none; }
+  .toolbar-left { display: flex; flex-wrap: wrap; gap: 8px; }
   .prio { flex: none; font-size: 10.5px; line-height: 16px; padding: 0 5px; border-radius: 4px; background: var(--grid); color: var(--muted); font-weight: 700; font-family: var(--num); }
   .track { position: relative; height: var(--row-h); background: var(--gridbg); }
   .seg { position: absolute; top: 50%; height: 12px; transform: translateY(-50%); border-radius: 6px; min-width: 5px; cursor: pointer; transition: opacity .18s, background-color .2s, box-shadow .2s; }
@@ -192,7 +206,7 @@
   .camp { display: grid; grid-template-columns: minmax(180px, 240px) minmax(0, 1fr); gap: 10px 20px; padding: 14px 16px; border-top: 1px solid var(--line); }
   .camp:first-child { border-top: 0; }
   .camp .meta { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
-  .camp .meta .t { font-weight: 600; font-size: 14.5px; display: flex; align-items: center; gap: 7px; }
+  .camp .meta .t { font-weight: 600; font-size: 14.5px; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 7px; }
   .camp .meta .s { color: var(--muted); font-size: 12.5px; }
   .phases { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px 16px; min-width: 0; }
   .ph { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
@@ -263,9 +277,16 @@
   </header>
 
   <div class="toolbar">
-    <div class="seg-ctrl" role="group" aria-label="Quais campanhas mostrar">
-      <button type="button" id="view-a" data-view="a" aria-pressed="true">Prioridade A</button>
-      <button type="button" id="view-all" data-view="all" aria-pressed="false">Todas as datas</button>
+    <div class="toolbar-left">
+      <div class="seg-ctrl" role="group" aria-label="Quais campanhas mostrar">
+        <button type="button" id="view-a" data-view="a" aria-pressed="true">Prioridade A</button>
+        <button type="button" id="view-all" data-view="all" aria-pressed="false">Todas as datas</button>
+      </div>
+      <div class="seg-ctrl" role="group" aria-label="Foco das campanhas">
+        <button type="button" data-foco="todos" aria-pressed="true">Todos os focos</button>
+        <button type="button" data-foco="branding" aria-pressed="false">Branding</button>
+        <button type="button" data-foco="vendas" aria-pressed="false">Vendas</button>
+      </div>
     </div>
     <div class="stats" id="stats"></div>
   </div>
@@ -284,10 +305,12 @@
     <div class="sec-head">
       <h2 id="h-crono">Cronograma</h2>
       <ul class="legend" aria-label="Legenda">
-        <li><span class="sw plan"></span>Planejamento e criação</li>
-        <li><span class="sw pre"></span>Pré-venda</li>
-        <li><span class="sw air"></span>Campanha no ar</li>
-        <li><span class="sw event"></span>Evento</li>
+        <li><span class="sw dot-b"></span>Branding</li>
+        <li><span class="sw dot-v"></span>Vendas</li>
+        <li><span class="sw plan"></span>Planejamento</li>
+        <li><span class="sw air"></span>Execução e divulgação</li>
+        <li><span class="sw pre"></span>Execução com pré-venda</li>
+        <li><span class="sw event"></span>Realização / evento</li>
         <li><span class="sw done"></span>Feito</li>
         <li><span class="sw late"></span>Atrasado</li>
         <li><span class="sw today"></span>Hoje</li>
@@ -310,7 +333,7 @@
     <div class="months" id="months"></div>
   </section>
 
-  <p class="note">Planejamento e criação começam em D-60 a partir do primeiro dia de cada período, ou D-90 nas campanhas com pré-venda (pré-venda em D-45). As datas e os prazos se atualizam sozinhos a cada dia.</p>
+  <p class="note"><b>Branding</b> (Férias de janeiro, Páscoa, Dia das Mães, Dia dos Namorados e Dia dos Pais): duas fases, planejamento a partir de D-60 (D-90 nas férias de janeiro) e realização no dia ou período da data. <b>Vendas</b> (todas as outras datas): planejamento de 90 dias, sendo 15 dias de planejamento (D-90 a D-76) e 75 dias de execução, divulgação ou pré-venda (D-75 a D-1), sem contar o dia ou o período do evento. As datas e os prazos se atualizam sozinhos a cada dia.</p>
 </div>
 
 <div class="tip" id="tip" role="tooltip" aria-hidden="true"><div class="v"></div><div class="p"></div><div class="m"></div></div>
@@ -347,19 +370,36 @@
   const MONTHS = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
   const MONTHS_LONG = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
 
+  // Foco de cada data. Branding: 2 fases (planejamento + realização). Vendas: 90 dias = 15 de planejamento + 75 de execução, fora o evento.
+  const BRANDING = new Set(["Férias de janeiro 2027", "Férias de janeiro 2028", "Páscoa", "Dia das Mães", "Dia dos Namorados", "Dia dos Pais"]);
+  const FOCO_LABEL = { branding: "Branding", vendas: "Vendas" };
   const CAMPAIGNS = RAW.map(([name, prio, product, units, period, plan, air, start, end, pre]) => {
     const key = slug(name);
-    const phases = [{ id: "plan", label: "Planejamento e criação", kind: "work", start: plan, due: add(pre || air, -1), tag: pre ? "D-90" : "D-60" }];
-    if (pre) phases.push({ id: "pre", label: "Pré-venda aberta", kind: "milestone", start: pre, due: pre, tag: "D-45" });
-    phases.push({ id: "air", label: "Campanha no ar", kind: "milestone", start: air, due: air });
-    phases.push({ id: "event", label: "Evento realizado", kind: "period", start, due: end, end });
-    return { key, name, prio, product, units, period, plan, air, start, end, pre, phases };
+    const foco = BRANDING.has(name) ? "branding" : "vendas";
+    let phases;
+    if (foco === "branding") {
+      // planejamento = soma das fases anteriores ao evento (D-60, ou D-90 nas férias de janeiro)
+      phases = [
+        { id: "plan", label: "Planejamento", kind: "work", start: plan, due: add(start, -1), tag: `D-${diff(plan, start)}`, seg: "plan" },
+        { id: "event", label: "Realização", kind: "period", start, due: end, end, seg: "event" }
+      ];
+    } else {
+      const p0 = add(start, -90), x0 = add(start, -75);
+      phases = [
+        { id: "plan", label: "Planejamento", kind: "work", start: p0, due: add(start, -76), tag: "D-90 a D-76", seg: "plan" },
+        { id: "exec", label: pre ? "Execução, divulgação e pré-venda" : "Execução e divulgação", kind: "work", start: x0, due: add(start, -1), tag: "D-75 a D-1", seg: pre ? "pre" : "air" },
+        { id: "event", label: "Evento", kind: "period", start, due: end, end, seg: "event" }
+      ];
+    }
+    return { key, name, prio, product, units, period, foco, plan: phases[0].start, start, end, pre, phases };
   });
   const KNOWN = new Set(CAMPAIGNS.flatMap(c => c.phases.map(p => `${c.key}__${p.id}`)));
 
   // ---- state
   let view = "a";
   try { if (localStorage.getItem("painel-view") === "all") view = "all"; } catch (e) {}
+  let foco = "todos";
+  try { const f = localStorage.getItem("painel-foco"); if (f === "branding" || f === "vendas") foco = f; } catch (e) {}
   let marks = {};           // docId -> {feito, por, em}
   let canWrite = false;     // true depois de entrar com a senha do time
   let writeKnown = false;
@@ -398,7 +438,12 @@
     return p.start === p.end ? full(p.start) : `${full(p.start)} a ${full(p.end)}`;
   }
 
-  const visible = () => view === "all" ? CAMPAIGNS : CAMPAIGNS.filter(c => c.prio === "A");
+  const visible = () => CAMPAIGNS.filter(c => (view === "all" || c.prio === "A") && (foco === "todos" || c.foco === foco));
+  function focoChip(c) {
+    const f = document.createElement("span"); f.className = `foco ${c.foco}`; f.title = FOCO_LABEL[c.foco];
+    const t = document.createElement("span"); t.textContent = FOCO_LABEL[c.foco]; f.append(t);
+    return f;
+  }
 
   // ---- header
   function renderHeader() {
@@ -410,6 +455,7 @@
     elToday.append(s);
     const list = visible();
     const first = list.reduce((a, c) => (!a || c.plan < a.plan ? c : a), null);
+    if (!first) return;
     const c0 = first.plan, c1 = list.reduce((a, c) => (c.end > a ? c.end : a), "0000-01-01");
     const total = diff(c0, c1) + 1;
     const cycLabel = document.getElementById("cycle-label"), cycBar = document.getElementById("cycle-bar"), cycPct = document.getElementById("cycle-pct");
@@ -559,7 +605,7 @@
     tip.querySelector(".v").textContent = dueText(p);
     tip.querySelector(".p").textContent = `${p.label}${p.tag ? ` (${p.tag})` : ""} · ${c.name}`;
     const mk = marks[docId(c, p)];
-    let meta = `${st.text} · Prioridade ${c.prio} · ${c.product}`;
+    let meta = `${st.text} · ${FOCO_LABEL[c.foco]} · Prioridade ${c.prio} · ${c.product}`;
     tip.querySelector(".m").textContent = meta;
     tip.classList.add("show"); tip.setAttribute("aria-hidden", "false");
     placeTip(x, y);
@@ -599,6 +645,7 @@
   }
 
   function renderGantt() {
+    if (!visible().length) { document.getElementById("g-rows").textContent = ""; return; }
     buildAxis(visible());
     const rowsEl = document.getElementById("g-rows"); rowsEl.textContent = "";
     const foot = document.getElementById("g-foot"); foot.textContent = "";
@@ -614,14 +661,14 @@
       const row = document.createElement("div"); row.className = "rowgrid row";
       const name = document.createElement("div"); name.className = "name";
       if (view === "all") { const ch = document.createElement("span"); ch.className = "prio"; ch.textContent = c.prio; name.append(ch); }
-      const t = document.createElement("span"); t.className = "txt"; t.textContent = c.name; t.title = c.name; name.append(t);
+      name.append(focoChip(c));
+      const t = document.createElement("span"); t.className = "txt"; t.textContent = c.name; t.title = `${c.name} · ${FOCO_LABEL[c.foco]}`; name.append(t);
       const track = document.createElement("div"); track.className = "track";
       if (showToday) { const tl = document.createElement("div"); tl.className = "todayline"; tl.style.left = `${tp}%`; track.append(tl); }
-      const [plan, pre, air, ev] = [c.phases.find(p => p.id === "plan"), c.phases.find(p => p.id === "pre"), c.phases.find(p => p.id === "air"), c.phases.find(p => p.id === "event")];
-      makeSeg(track, c, plan, c.plan, c.pre || c.air, "plan");
-      if (pre) makeSeg(track, c, pre, c.pre, c.air, "pre");
-      makeSeg(track, c, air, c.air, c.start, "air");
-      makeSeg(track, c, ev, c.start, add(c.end, 1), "event", c.start === c.end);
+      c.phases.forEach(p => {
+        if (p.kind === "period") makeSeg(track, c, p, p.start, add(p.end, 1), "event", p.start === p.end);
+        else makeSeg(track, c, p, p.start, add(p.due, 1), p.seg);
+      });
       row.append(name, track);
       row.addEventListener("pointerenter", () => { gantt.classList.add("dim"); row.classList.add("on"); });
       row.addEventListener("pointerleave", () => { gantt.classList.remove("dim"); row.classList.remove("on"); });
@@ -654,7 +701,7 @@
         const meta = document.createElement("div"); meta.className = "meta";
         const t = document.createElement("div"); t.className = "t";
         const ch = document.createElement("span"); ch.className = "prio"; ch.textContent = c.prio;
-        t.append(ch, document.createTextNode(c.name));
+        t.append(ch, focoChip(c), document.createTextNode(c.name));
         const s = document.createElement("div"); s.className = "s";
         s.textContent = `${c.period} · ${c.product} · ${c.units === "Todas" ? "todas as unidades" : c.units}`;
         meta.append(t, s);
@@ -706,6 +753,16 @@
     document.getElementById("view-all").setAttribute("aria-pressed", String(v === "all"));
     hideTip(); renderAll();
   }
+  function setFoco(f) {
+    foco = f;
+    try { localStorage.setItem("painel-foco", f); } catch (e) {}
+    document.querySelectorAll("[data-foco]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.foco === f)));
+    hideTip(); renderAll();
+  }
+  document.querySelectorAll("[data-foco]").forEach(b => {
+    b.setAttribute("aria-pressed", String(b.dataset.foco === foco));
+    b.addEventListener("click", () => setFoco(b.dataset.foco));
+  });
   document.getElementById("view-a").addEventListener("click", () => setView("a"));
   document.getElementById("view-all").addEventListener("click", () => setView("all"));
   document.addEventListener("pointerdown", () => { if (pinned) hideTip(); });
