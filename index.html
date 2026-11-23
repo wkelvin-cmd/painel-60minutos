@@ -308,7 +308,7 @@
         <li><span class="sw dot-b"></span>Branding</li>
         <li><span class="sw dot-v"></span>Vendas</li>
         <li><span class="sw plan"></span>Planejamento</li>
-        <li><span class="sw air"></span>Execução e divulgação</li>
+        <li><span class="sw air"></span>Execução e divulgação / no ar</li>
         <li><span class="sw pre"></span>Execução com pré-venda</li>
         <li><span class="sw event"></span>Realização / evento</li>
         <li><span class="sw done"></span>Feito</li>
@@ -333,7 +333,7 @@
     <div class="months" id="months"></div>
   </section>
 
-  <p class="note"><b>Branding</b> (Férias de janeiro, Páscoa, Dia das Mães, Dia dos Namorados e Dia dos Pais): duas fases, planejamento a partir de D-60 (D-90 nas férias de janeiro) e realização no dia ou período da data. <b>Vendas</b> (todas as outras datas): planejamento de 90 dias, sendo 15 dias de planejamento (D-90 a D-76) e 75 dias de execução, divulgação ou pré-venda (D-75 a D-1), sem contar o dia ou o período do evento. As datas e os prazos se atualizam sozinhos a cada dia.</p>
+  <p class="note">Regras da <b>Prioridade A</b>. <b>Branding</b> (Férias de janeiro, Páscoa, Dia das Mães, Dia dos Namorados e Dia dos Pais): duas fases, planejamento a partir de D-60 (D-90 nas férias de janeiro) e realização no dia ou período da data. <b>Vendas</b> (todas as outras datas): planejamento de 90 dias, sendo 15 dias de planejamento (D-90 a D-76) e 75 dias de execução, divulgação ou pré-venda (D-75 a D-1), sem contar o dia ou o período do evento. As datas de prioridade B e C seguem o modelo D-60: planejamento e criação, campanha no ar e evento. As datas e os prazos se atualizam sozinhos a cada dia.</p>
 </div>
 
 <div class="tip" id="tip" role="tooltip" aria-hidden="true"><div class="v"></div><div class="p"></div><div class="m"></div></div>
@@ -375,9 +375,16 @@
   const FOCO_LABEL = { branding: "Branding", vendas: "Vendas" };
   const CAMPAIGNS = RAW.map(([name, prio, product, units, period, plan, air, start, end, pre]) => {
     const key = slug(name);
-    const foco = BRANDING.has(name) ? "branding" : "vendas";
+    // foco Branding/Vendas só vale para as datas de Prioridade A; B e C seguem o modelo D-60 (planejamento, campanha no ar, evento)
+    const foco = prio !== "A" ? null : BRANDING.has(name) ? "branding" : "vendas";
     let phases;
-    if (foco === "branding") {
+    if (!foco) {
+      phases = [
+        { id: "plan", label: "Planejamento e criação", kind: "work", start: plan, due: add(air, -1), tag: "D-60", seg: "plan" },
+        { id: "air", label: "Campanha no ar", kind: "milestone", start: air, due: air, seg: "air", drawEnd: start },
+        { id: "event", label: "Evento realizado", kind: "period", start, due: end, end, seg: "event" }
+      ];
+    } else if (foco === "branding") {
       // planejamento = soma das fases anteriores ao evento (D-60, ou D-90 nas férias de janeiro)
       phases = [
         { id: "plan", label: "Planejamento", kind: "work", start: plan, due: add(start, -1), tag: `D-${diff(plan, start)}`, seg: "plan" },
@@ -440,6 +447,7 @@
 
   const visible = () => CAMPAIGNS.filter(c => (view === "all" || c.prio === "A") && (foco === "todos" || c.foco === foco));
   function focoChip(c) {
+    if (!c.foco) return document.createTextNode("");
     const f = document.createElement("span"); f.className = `foco ${c.foco}`; f.title = FOCO_LABEL[c.foco];
     const t = document.createElement("span"); t.textContent = FOCO_LABEL[c.foco]; f.append(t);
     return f;
@@ -477,7 +485,7 @@
     const consider = (c, date, text) => { if (date >= todayIso && (!best || date < best.date)) best = { c, date, text }; };
     list.forEach(c => c.phases.forEach(p => {
       if (isDone(c, p) || p.kind === "period") return;
-      if (p.kind === "work") consider(c, todayIso < p.start ? p.start : p.due, todayIso < p.start ? `Começa o planejamento: ${c.name}` : `Fim do planejamento: ${c.name}`);
+      if (p.kind === "work") consider(c, todayIso < p.start ? p.start : p.due, `${todayIso < p.start ? "Começa" : "Termina"} ${p.label.toLowerCase()}: ${c.name}`);
       else consider(c, p.due, `${p.label}: ${c.name}`);
     }));
     const dEl = document.getElementById("next-d"), vEl = document.getElementById("next-v");
@@ -605,7 +613,7 @@
     tip.querySelector(".v").textContent = dueText(p);
     tip.querySelector(".p").textContent = `${p.label}${p.tag ? ` (${p.tag})` : ""} · ${c.name}`;
     const mk = marks[docId(c, p)];
-    let meta = `${st.text} · ${FOCO_LABEL[c.foco]} · Prioridade ${c.prio} · ${c.product}`;
+    let meta = `${st.text}${c.foco ? ` · ${FOCO_LABEL[c.foco]}` : ""} · Prioridade ${c.prio} · ${c.product}`;
     tip.querySelector(".m").textContent = meta;
     tip.classList.add("show"); tip.setAttribute("aria-hidden", "false");
     placeTip(x, y);
@@ -662,12 +670,12 @@
       const name = document.createElement("div"); name.className = "name";
       if (view === "all") { const ch = document.createElement("span"); ch.className = "prio"; ch.textContent = c.prio; name.append(ch); }
       name.append(focoChip(c));
-      const t = document.createElement("span"); t.className = "txt"; t.textContent = c.name; t.title = `${c.name} · ${FOCO_LABEL[c.foco]}`; name.append(t);
+      const t = document.createElement("span"); t.className = "txt"; t.textContent = c.name; t.title = c.foco ? `${c.name} · ${FOCO_LABEL[c.foco]}` : c.name; name.append(t);
       const track = document.createElement("div"); track.className = "track";
       if (showToday) { const tl = document.createElement("div"); tl.className = "todayline"; tl.style.left = `${tp}%`; track.append(tl); }
       c.phases.forEach(p => {
         if (p.kind === "period") makeSeg(track, c, p, p.start, add(p.end, 1), "event", p.start === p.end);
-        else makeSeg(track, c, p, p.start, add(p.due, 1), p.seg);
+        else makeSeg(track, c, p, p.start, p.drawEnd || add(p.due, 1), p.seg);
       });
       row.append(name, track);
       row.addEventListener("pointerenter", () => { gantt.classList.add("dim"); row.classList.add("on"); });
