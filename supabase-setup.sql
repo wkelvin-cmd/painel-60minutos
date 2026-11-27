@@ -101,3 +101,42 @@ on conflict (id) do nothing;
 
 -- Para trocar a senha depois:
 --   update public.painel_config set valor = 'NOVA_SENHA' where chave = 'senha_time';
+
+-- =====================================================================
+-- 7) Mapa de oportunidades (aba "Oportunidades")
+--    Preenchido pela pesquisa semanal; a equipe muda status e nota com a senha do time.
+-- =====================================================================
+create table if not exists public.oportunidades (
+  id text primary key, titulo text not null, categoria text not null, universo text, salas text, unidades text,
+  data_inicio date, data_fim date, data_texto text,
+  confirmacao text not null default 'prevista' check (confirmacao in ('confirmada','prevista','rumor','a confirmar')),
+  usos text[] not null default '{}', ideia text, parceiro text, fonte_titulo text, fonte_url text,
+  status text not null default 'nova' check (status in ('nova','em_analise','aprovada','descartada')),
+  nota text, encontrada_em date not null default current_date, atualizado_em timestamptz not null default now(), atualizado_por text
+);
+alter table public.oportunidades enable row level security;
+drop policy if exists "leitura publica" on public.oportunidades;
+create policy "leitura publica" on public.oportunidades for select to anon, authenticated using (true);
+grant select on public.oportunidades to anon, authenticated;
+revoke insert, update, delete on public.oportunidades from anon, authenticated;
+
+create or replace function public.atualizar_oportunidade(p_senha text, p_id text, p_status text, p_nota text, p_por text)
+returns boolean language plpgsql security definer set search_path = public as $$
+begin
+  if not exists (select 1 from public.painel_config where chave = 'senha_time' and valor = p_senha) then return false; end if;
+  if p_status not in ('nova','em_analise','aprovada','descartada') then return false; end if;
+  update public.oportunidades set status = p_status, nota = left(p_nota, 500), atualizado_em = now(), atualizado_por = left(p_por, 60) where id = p_id;
+  return found;
+end; $$;
+revoke all on function public.atualizar_oportunidade(text, text, text, text, text) from public;
+grant execute on function public.atualizar_oportunidade(text, text, text, text, text) to anon, authenticated;
+alter table public.oportunidades replica identity full;
+
+create table if not exists public.pesquisas (
+  id bigint generated always as identity primary key, rodada_em timestamptz not null default now(),
+  novas int not null default 0, atualizadas int not null default 0, resumo text
+);
+alter table public.pesquisas enable row level security;
+drop policy if exists "leitura publica" on public.pesquisas;
+create policy "leitura publica" on public.pesquisas for select to anon, authenticated using (true);
+grant select on public.pesquisas to anon, authenticated;
