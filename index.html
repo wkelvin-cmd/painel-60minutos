@@ -238,6 +238,58 @@
   .login .row { display: flex; gap: 10px; justify-content: flex-end; }
   .login .ghost { background: none; color: var(--muted); }
 
+
+  /* Oportunidades */
+  [hidden] { display: none !important; }
+  .opp-intro { margin: 0; color: var(--muted); font-size: 13.5px; max-width: 760px; }
+  .opp-bar { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; justify-content: space-between; }
+  .opp-bar .filters { display: flex; flex-wrap: wrap; gap: 8px; }
+  .opp-months { display: grid; grid-template-columns: repeat(14, minmax(0, 1fr)); gap: 4px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); padding: 10px; }
+  .opp-month { border: 0; background: none; cursor: pointer; padding: 6px 2px 4px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; gap: 5px; min-width: 0; color: var(--muted); font-size: 11.5px; }
+  .opp-month:hover, .opp-month:focus-visible { background: var(--grid); outline: none; }
+  .opp-month .y { font-family: var(--num); font-size: 10px; color: var(--faint); min-height: 12px; }
+  .opp-month .dots { display: flex; flex-wrap: wrap; justify-content: center; gap: 3px; min-height: 26px; align-content: flex-end; max-width: 40px; }
+  .opp-month .dots i { width: 8px; height: 8px; border-radius: 50%; background: var(--ink); opacity: .85; }
+  .opp-month .dots i.parceria { background: var(--f-sales); }
+  .opp-month .dots i.atracao { background: var(--brand); }
+  .opp-month .dots i.conteudo { background: var(--f-brand); }
+  .opp-month.empty-m .dots::after { content: "·"; color: var(--faint); }
+  .opp-month.now { color: var(--ink); font-weight: 700; }
+  .opp-key { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12px; color: var(--muted); list-style: none; margin: 0; padding: 0; }
+  .opp-key li { display: inline-flex; align-items: center; gap: 6px; }
+  .opp-key i { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+  .opp-group { display: flex; flex-direction: column; gap: 10px; scroll-margin-top: 16px; }
+  .opp-group h3 { margin: 6px 0 0; font: 700 15px var(--display); font-stretch: 85%; color: var(--muted); }
+  .opp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 360px), 1fr)); gap: 12px; }
+  .opp { display: flex; flex-direction: column; gap: 9px; padding: 14px 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); min-width: 0; }
+  .opp.descartada { opacity: .55; }
+  .opp.aprovada { box-shadow: inset 3px 0 0 var(--ok); }
+  .opp .top { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 11.5px; color: var(--muted); }
+  .opp .tag { padding: 1px 7px; border-radius: 4px; background: var(--grid); font-weight: 600; }
+  .opp .tag.nova { background: var(--brand); color: #fff; letter-spacing: .04em; text-transform: uppercase; font-size: 10.5px; }
+  .opp h4 { margin: 0; font-size: 15.5px; line-height: 1.3; }
+  .opp .when { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; font-size: 13px; }
+  .opp .when .d { font-family: var(--num); font-size: 12.5px; }
+  .opp .where { font-size: 12.5px; color: var(--muted); }
+  .opp .usos { display: flex; flex-wrap: wrap; gap: 6px; }
+  .opp .uso { font-size: 11.5px; font-weight: 600; padding: 1px 8px; border-radius: 999px; border: 1px solid currentColor; }
+  .opp .uso.conteudo { color: var(--f-brand); }
+  .opp .uso.parceria { color: var(--f-sales); }
+  .opp .uso.atracao { color: var(--brand); }
+  .opp p { margin: 0; font-size: 13.5px; line-height: 1.5; }
+  .opp .janela { font-size: 12.5px; padding: 6px 10px; border-radius: 8px; background: var(--grid); }
+  .opp .janela.agir { background: var(--warn-soft); color: var(--warn); font-weight: 600; }
+  .opp .meta2 { font-size: 12.5px; color: var(--muted); display: flex; flex-direction: column; gap: 3px; }
+  .opp .meta2 a { color: inherit; }
+  .opp .foot { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; border-top: 1px solid var(--line); padding-top: 10px; margin-top: auto; }
+  .opp select, .opp textarea { font: 13px var(--body); color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 5px 8px; }
+  .opp textarea { width: 100%; min-height: 54px; resize: vertical; }
+  .opp .by { font-size: 11.5px; color: var(--faint); }
+  .pill.conf-confirmada { color: var(--ok); background: var(--ok-soft); }
+  .pill.conf-prevista { color: var(--warn); background: var(--warn-soft); }
+  .pill.conf-rumor { color: var(--muted); background: var(--grid); }
+  .pill.conf-a-confirmar { color: var(--now); background: var(--now-soft); }
+  @media (max-width: 720px) { .opp-months { grid-template-columns: repeat(7, minmax(0, 1fr)); } }
   @media (max-width: 720px) {
     header { grid-template-columns: 1fr; }
     .next { max-width: none; }
@@ -281,19 +333,20 @@
       <div class="seg-ctrl" role="group" aria-label="Quais campanhas mostrar">
         <button type="button" id="view-a" data-view="a" aria-pressed="true">Prioridade A</button>
         <button type="button" id="view-all" data-view="all" aria-pressed="false">Todas as datas</button>
+        <button type="button" id="view-opp" data-view="opp" aria-pressed="false">Oportunidades</button>
       </div>
-      <div class="seg-ctrl" role="group" aria-label="Foco das campanhas">
+      <div class="seg-ctrl camp-only" role="group" aria-label="Foco das campanhas">
         <button type="button" data-foco="todos" aria-pressed="true">Todos os focos</button>
         <button type="button" data-foco="branding" aria-pressed="false">Branding</button>
         <button type="button" data-foco="vendas" aria-pressed="false">Vendas</button>
       </div>
     </div>
-    <div class="stats" id="stats"></div>
+    <div class="stats camp-only" id="stats"></div>
   </div>
   <div class="sync" id="sync">Conectando às marcações do time…</div>
-  <div class="ro-note" id="ro-note" hidden><span id="ro-text">Você está vendo em modo leitura. Entre com seu nome e a senha do time para marcar as etapas.</span><button type="button" id="btn-login">Entrar para marcar</button></div>
+  <div class="ro-note" id="ro-note" hidden><span id="ro-text">Você está vendo em modo leitura. Entre com seu nome e a senha do time para marcar etapas e avaliar oportunidades.</span><button type="button" id="btn-login">Entrar para marcar</button></div>
 
-  <section aria-labelledby="h-hoje">
+  <section class="camp-only" aria-labelledby="h-hoje">
     <div class="sec-head">
       <h2 id="h-hoje">Para hoje</h2>
       <p>Atrasos, etapas em andamento e prazos dos próximos 14 dias.</p>
@@ -301,7 +354,7 @@
     <div class="agenda" id="agenda"></div>
   </section>
 
-  <section aria-labelledby="h-crono">
+  <section class="camp-only" aria-labelledby="h-crono">
     <div class="sec-head">
       <h2 id="h-crono">Cronograma</h2>
       <ul class="legend" aria-label="Legenda">
@@ -325,7 +378,7 @@
     </div>
   </section>
 
-  <section aria-labelledby="h-check">
+  <section class="camp-only" aria-labelledby="h-check">
     <div class="sec-head">
       <h2 id="h-check">Checklist por campanha</h2>
       <p>Marque cada etapa quando ela for concluída. A marcação aparece para todo o time.</p>
@@ -333,7 +386,32 @@
     <div class="months" id="months"></div>
   </section>
 
-  <p class="note">Regras da <b>Prioridade A</b>. <b>Branding</b> (Férias de janeiro, Páscoa, Dia das Mães, Dia dos Namorados e Dia dos Pais): duas fases, planejamento a partir de D-60 (D-90 nas férias de janeiro) e realização no dia ou período da data. <b>Vendas</b> (todas as outras datas): 90 dias antes do evento, sem contar o dia ou o período dele. O padrão é 15 dias de planejamento (D-90 a D-76) e 75 de execução e divulgação (D-75 a D-1). Exceções: Férias de julho (30 de planejamento, 30 de divulgação e pré-venda, 30 de execução), Sexta-feira 13 (60 de planejamento, 30 de execução), Black Friday (60 de planejamento, 30 de divulgação) e Halloween (45 de planejamento, 45 de execução e pré-venda). As datas de prioridade B e C seguem o modelo D-60: planejamento e criação, campanha no ar e evento. As datas e os prazos se atualizam sozinhos a cada dia.</p>
+  <section id="opp" aria-labelledby="h-opp" hidden>
+    <div class="sec-head"><h2 id="h-opp">Mapa de oportunidades</h2><p id="opp-meta">Carregando…</p></div>
+    <p class="opp-intro">Lançamentos, estreias e eventos ligados às salas, para gerar conteúdo, parcerias e atrações. Uma nova pesquisa roda toda segunda-feira e as novidades aparecem com o selo <b>Nova</b>. Quanto antes a equipe avaliar, mais tempo há para propor parcerias.</p>
+    <div class="opp-bar">
+      <div class="filters">
+        <div class="seg-ctrl" role="group" aria-label="Filtrar por uso">
+          <button type="button" data-uso="todos" aria-pressed="true">Todos os usos</button>
+          <button type="button" data-uso="conteudo" aria-pressed="false">Conteúdo</button>
+          <button type="button" data-uso="parceria" aria-pressed="false">Parceria</button>
+          <button type="button" data-uso="atracao" aria-pressed="false">Atração</button>
+        </div>
+        <div class="seg-ctrl" role="group" aria-label="Filtrar por status">
+          <button type="button" data-st="abertas" aria-pressed="true">Em aberto</button>
+          <button type="button" data-st="aprovada" aria-pressed="false">Aprovadas</button>
+          <button type="button" data-st="descartada" aria-pressed="false">Descartadas</button>
+          <button type="button" data-st="todas" aria-pressed="false">Todas</button>
+        </div>
+      </div>
+      <div class="stats" id="opp-stats"></div>
+    </div>
+    <ul class="opp-key"><li><i style="background:var(--f-brand)"></i>Conteúdo</li><li><i style="background:var(--f-sales)"></i>Parceria</li><li><i style="background:var(--brand)"></i>Atração</li><li>Cada ponto é uma oportunidade com data. Clique no mês para ir até ele.</li></ul>
+    <div class="opp-months" id="opp-months"></div>
+    <div id="opp-list"></div>
+  </section>
+
+  <p class="note camp-only">Regras da <b>Prioridade A</b>. <b>Branding</b> (Férias de janeiro, Páscoa, Dia das Mães, Dia dos Namorados e Dia dos Pais): duas fases, planejamento a partir de D-60 (D-90 nas férias de janeiro) e realização no dia ou período da data. <b>Vendas</b> (todas as outras datas): 90 dias antes do evento, sem contar o dia ou o período dele. O padrão é 15 dias de planejamento (D-90 a D-76) e 75 de execução e divulgação (D-75 a D-1). Exceções: Férias de julho (30 de planejamento, 30 de divulgação e pré-venda, 30 de execução), Sexta-feira 13 (60 de planejamento, 30 de execução), Black Friday (60 de planejamento, 30 de divulgação) e Halloween (45 de planejamento, 45 de execução e pré-venda). As datas de prioridade B e C seguem o modelo D-60: planejamento e criação, campanha no ar e evento. As datas e os prazos se atualizam sozinhos a cada dia.</p>
 </div>
 
 <div class="tip" id="tip" role="tooltip" aria-hidden="true"><div class="v"></div><div class="p"></div><div class="m"></div></div>
@@ -413,7 +491,7 @@
 
   // ---- state
   let view = "a";
-  try { if (localStorage.getItem("painel-view") === "all") view = "all"; } catch (e) {}
+  try { const v = localStorage.getItem("painel-view"); if (v === "all" || v === "opp") view = v; } catch (e) {}
   let foco = "todos";
   try { const f = localStorage.getItem("painel-foco"); if (f === "branding" || f === "vendas") foco = f; } catch (e) {}
   let marks = {};           // docId -> {feito, por, em}
@@ -754,7 +832,7 @@
 
 
   function renderAll() {
-    renderHeader(); renderStats(); renderAgenda(); renderGantt(); renderChecklist();
+    renderHeader(); renderStats(); renderAgenda(); renderGantt(); renderChecklist(); renderOpp();
   }
 
   function setSync(text, warn) {
@@ -768,6 +846,9 @@
     try { localStorage.setItem("painel-view", v); } catch (e) {}
     document.getElementById("view-a").setAttribute("aria-pressed", String(v === "a"));
     document.getElementById("view-all").setAttribute("aria-pressed", String(v === "all"));
+    document.getElementById("view-opp").setAttribute("aria-pressed", String(v === "opp"));
+    document.querySelectorAll(".camp-only").forEach(el => { el.hidden = v === "opp"; });
+    document.getElementById("opp").hidden = v !== "opp";
     hideTip(); renderAll();
   }
   function setFoco(f) {
@@ -782,6 +863,7 @@
   });
   document.getElementById("view-a").addEventListener("click", () => setView("a"));
   document.getElementById("view-all").addEventListener("click", () => setView("all"));
+  document.getElementById("view-opp").addEventListener("click", () => setView("opp"));
   document.addEventListener("pointerdown", () => { if (pinned) hideTip(); });
   addEventListener("scroll", () => { if (!pinned) hideTip(); }, { passive: true });
 
@@ -799,6 +881,160 @@
   setView(view);
   scheduleMidnight();
 
+
+  // ---- Mapa de oportunidades
+  // var (e não let): renderAll roda na primeira pintura, antes desta parte do script
+  var opps = null;            // null = ainda não carregou
+  var oppErr = "";
+  var lastSearch = null;
+  var oppUso = "todos", oppSt = "abertas";
+  const USO_LABEL = { conteudo: "Conteúdo", parceria: "Parceria", atracao: "Atração" };
+  const ST_LABEL = { nova: "Nova", em_analise: "Em análise", aprovada: "Aprovada", descartada: "Descartada" };
+  const CONF_LABEL = { confirmada: "Data confirmada", prevista: "Previsão", rumor: "Rumor", "a confirmar": "A confirmar" };
+  const dmyO = iso => `${iso.slice(8, 10)}/${iso.slice(5, 7)}/${iso.slice(0, 4)}`;
+  const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+  const safeUrl = u => /^https?:\/\//i.test(u || "") ? u : null;
+
+  function oppFiltered() {
+    return (opps || []).filter(o =>
+      (oppUso === "todos" || (o.usos || []).includes(oppUso)) &&
+      (oppSt === "todas" ? true : oppSt === "abertas" ? (o.status === "nova" || o.status === "em_analise") : o.status === oppSt) &&
+      !(o.data_inicio && (o.data_fim || o.data_inicio) < add(todayIso, -30)));   // some depois de 30 dias do fim
+  }
+  const isNew = o => o.status === "nova" && diff(o.encontrada_em, todayIso) <= 7;
+
+  function renderOpp() {
+    const meta = document.getElementById("opp-meta");
+    const list = document.getElementById("opp-list");
+    const months = document.getElementById("opp-months");
+    const stats = document.getElementById("opp-stats");
+    if (!list) return;
+    list.textContent = ""; months.textContent = ""; stats.textContent = "";
+    if (opps == null) { meta.textContent = oppErr || "Carregando…"; return; }
+    meta.textContent = lastSearch ? `Última pesquisa: ${dmyO(lastSearch.rodada_em.slice(0, 10))} · ${lastSearch.novas} ${lastSearch.novas === 1 ? "novidade" : "novidades"}` : "Nenhuma pesquisa registrada ainda";
+
+    const all = opps.filter(o => !(o.data_inicio && (o.data_fim || o.data_inicio) < add(todayIso, -30)));
+    const nNew = all.filter(isNew).length;
+    const nOpen = all.filter(o => o.status === "nova" || o.status === "em_analise").length;
+    const nAct = all.filter(o => o.data_inicio && o.status !== "descartada" && diff(todayIso, o.data_inicio) >= 0 && diff(todayIso, o.data_inicio) <= 90).length;
+    [[nNew, "novas na semana", nNew ? "now" : ""], [nOpen, "para avaliar", ""], [nAct, "acontecem em até 90 dias", nAct ? "crit" : ""]].forEach(([n, t, c]) => {
+      const st = el("span", `stat ${c}`); st.append(el("b", "", String(n)), document.createTextNode(t)); stats.append(st);
+    });
+
+    const items = oppFiltered().sort((a, b) => (a.data_inicio || "9999").localeCompare(b.data_inicio || "9999") || a.titulo.localeCompare(b.titulo));
+
+    // faixa de meses
+    const base = new Date(Date.parse(todayIso.slice(0, 7) + "-01T00:00:00Z"));
+    for (let i = 0; i < 14; i++) {
+      const d = new Date(Date.UTC(base.getUTCFullYear(), base.getUTCMonth() + i, 1));
+      const key = d.toISOString().slice(0, 7);
+      const inMonth = items.filter(o => o.data_inicio && o.data_inicio.slice(0, 7) === key);
+      const b = el("button", `opp-month${i === 0 ? " now" : ""}${inMonth.length ? "" : " empty-m"}`);
+      b.type = "button";
+      b.title = inMonth.length ? inMonth.map(o => `${dm(o.data_inicio)} · ${o.titulo}`).join("\n") : "Nada mapeado neste mês";
+      b.setAttribute("aria-label", `${MONTHS_LONG[d.getUTCMonth()]} de ${d.getUTCFullYear()}: ${inMonth.length} ${inMonth.length === 1 ? "oportunidade" : "oportunidades"}`);
+      b.append(el("span", "y", (i === 0 || d.getUTCMonth() === 0) ? String(d.getUTCFullYear()) : ""));
+      const dots = el("span", "dots");
+      inMonth.forEach(o => dots.append(el("i", (o.usos || [])[0] || "")));
+      b.append(dots, el("span", "", MONTHS[d.getUTCMonth()]));
+      b.addEventListener("click", () => { const g = document.getElementById(`opp-m-${key}`); if (g) g.scrollIntoView({ behavior: "smooth", block: "start" }); });
+      months.append(b);
+    }
+
+    if (!items.length) { list.append(el("div", "empty agenda", "Nenhuma oportunidade com esses filtros.")); return; }
+    const groups = new Map();
+    items.forEach(o => { const k = o.data_inicio ? o.data_inicio.slice(0, 7) : "sem-data"; if (!groups.has(k)) groups.set(k, []); groups.get(k).push(o); });
+    groups.forEach((arr, k) => {
+      const g = el("div", "opp-group"); g.id = `opp-m-${k}`;
+      g.append(el("h3", "", k === "sem-data" ? "Sem data definida" : `${MONTHS_LONG[+k.slice(5, 7) - 1]} de ${k.slice(0, 4)}`));
+      const grid = el("div", "opp-grid");
+      arr.forEach(o => grid.append(oppCard(o)));
+      g.append(grid); list.append(g);
+    });
+  }
+
+  function oppCard(o) {
+    const c = el("article", `opp ${o.status}`);
+    const top = el("div", "top");
+    if (isNew(o)) top.append(el("span", "tag nova", "Nova"));
+    top.append(el("span", "tag", o.categoria));
+    if (o.universo) top.append(el("span", "", o.universo));
+    c.append(top, el("h4", "", o.titulo));
+
+    const when = el("div", "when");
+    when.append(el("span", "d", o.data_texto || (o.data_inicio ? dmyO(o.data_inicio) : "Data a definir")));
+    when.append(el("span", `pill conf-${slug(o.confirmacao)}`, CONF_LABEL[o.confirmacao] || o.confirmacao));
+    if (o.data_inicio) {
+      const n = diff(todayIso, o.data_inicio), endIso = o.data_fim || o.data_inicio;
+      when.append(el("span", "where", n > 0 ? `em ${n} ${n === 1 ? "dia" : "dias"}` : todayIso <= endIso ? "acontecendo agora" : "já passou"));
+    }
+    c.append(when);
+    if (o.salas || o.unidades) c.append(el("div", "where", [o.salas, o.unidades].filter(Boolean).join(" · ")));
+    const usos = el("div", "usos"); (o.usos || []).forEach(u => usos.append(el("span", `uso ${u}`, USO_LABEL[u] || u))); c.append(usos);
+    if (o.ideia) c.append(el("p", "", o.ideia));
+
+    if (o.data_inicio && o.status !== "descartada") {
+      const d90 = add(o.data_inicio, -90), n = diff(todayIso, o.data_inicio);
+      if (n > 90) c.append(el("div", "janela", `Para virar campanha de vendas (90 dias), comece o planejamento até ${dmyO(d90)}.`));
+      else if (n >= 0) c.append(el("div", "janela agir", n <= 30 ? `Faltam ${n} dias: dá tempo só para conteúdo e ações rápidas.` : `Já dentro da janela de 90 dias: decidir agora.`));
+    }
+    const m2 = el("div", "meta2");
+    if (o.parceiro) m2.append(el("span", "", `Parceiro possível: ${o.parceiro}`));
+    const url = safeUrl(o.fonte_url);
+    if (url || o.fonte_titulo) {
+      const f = el("span", "", "Fonte: ");
+      if (url) { const a = el("a", "", o.fonte_titulo || "link"); a.href = url; a.target = "_blank"; a.rel = "noopener noreferrer"; f.append(a); }
+      else f.append(document.createTextNode(o.fonte_titulo));
+      m2.append(f);
+    }
+    if (m2.childNodes.length) c.append(m2);
+
+    const foot = el("div", "foot");
+    if (canWrite) {
+      const sel = el("select"); sel.setAttribute("aria-label", `Status de ${o.titulo}`);
+      Object.entries(ST_LABEL).forEach(([v, t]) => { const op = el("option", "", t); op.value = v; op.selected = v === o.status; sel.append(op); });
+      const ta = el("textarea"); ta.placeholder = "Nota da equipe (opcional)"; ta.value = o.nota || ""; ta.maxLength = 500;
+      const save = async () => {
+        if (sel.value === o.status && ta.value === (o.nota || "")) return;
+        sel.disabled = ta.disabled = true;
+        try {
+          const { data, error } = await sb.rpc("atualizar_oportunidade", { p_senha: session.senha, p_id: o.id, p_status: sel.value, p_nota: ta.value, p_por: session.nome });
+          if (error) throw error;
+          if (data === false) { setSync("Não foi possível salvar: confira a senha do time.", true); return; }
+          Object.assign(o, { status: sel.value, nota: ta.value, atualizado_por: session.nome, atualizado_em: new Date().toISOString() });
+          renderOpp();
+        } catch (e) { setSync("Não foi possível salvar agora. Confira a internet e tente de novo.", true); }
+        finally { sel.disabled = ta.disabled = false; }
+      };
+      sel.addEventListener("change", save); ta.addEventListener("blur", save);
+      foot.append(sel, ta);
+    } else {
+      foot.append(el("span", `pill ${o.status === "aprovada" ? "done" : o.status === "descartada" ? "wait" : o.status === "em_analise" ? "now" : "soon"}`, ST_LABEL[o.status] || o.status));
+      if (o.nota) foot.append(el("span", "where", o.nota));
+    }
+    if (o.atualizado_por) foot.append(el("span", "by", `Atualizado por ${o.atualizado_por} em ${dmyO(o.atualizado_em.slice(0, 10))}`));
+    c.append(foot);
+    return c;
+  }
+
+  document.querySelectorAll("[data-uso]").forEach(b => b.addEventListener("click", () => {
+    oppUso = b.dataset.uso; document.querySelectorAll("[data-uso]").forEach(x => x.setAttribute("aria-pressed", String(x === b))); renderOpp();
+  }));
+  document.querySelectorAll("[data-st]").forEach(b => b.addEventListener("click", () => {
+    oppSt = b.dataset.st; document.querySelectorAll("[data-st]").forEach(x => x.setAttribute("aria-pressed", String(x === b))); renderOpp();
+  }));
+
+  async function loadOpps() {
+    try {
+      const [{ data, error }, last] = await Promise.all([
+        sb.from("oportunidades").select("*"),
+        sb.from("pesquisas").select("rodada_em, novas, atualizadas").order("rodada_em", { ascending: false }).limit(1)
+      ]);
+      if (error) throw error;
+      opps = data; lastSearch = (last.data || [])[0] || null; oppErr = "";
+    } catch (e) { oppErr = "Não foi possível carregar as oportunidades agora."; }
+    renderOpp();
+  }
 
   // ---- sessão (nome + senha do time, guardados neste navegador)
   function loadSession() {
@@ -819,7 +1055,7 @@
       btn.textContent = "Sair"; btn.className = "link";
     } else {
       ro.hidden = false;
-      txt.textContent = "Você está vendo em modo leitura. Entre com seu nome e a senha do time para marcar as etapas.";
+      txt.textContent = "Você está vendo em modo leitura. Entre com seu nome e a senha do time para marcar etapas e avaliar oportunidades.";
       btn.textContent = "Entrar para marcar"; btn.className = "";
     }
     renderAll();
@@ -891,6 +1127,7 @@
     const cfg = window.PAINEL_CONFIG || {};
     if (!window.supabase || !cfg.SUPABASE_URL || /COLE_AQUI/.test(cfg.SUPABASE_URL + cfg.SUPABASE_ANON_KEY)) {
       setSync("Marcações desligadas: o painel ainda não foi ligado ao banco de dados. Datas e prazos já estão atualizados.", true);
+      oppErr = "As oportunidades aparecem quando o painel está ligado ao banco de dados."; renderOpp();
       return;
     }
     sb = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
@@ -904,6 +1141,11 @@
       data.forEach(r => { if (r.feito) next[r.id] = r; });
       marks = next; updateCount(); renderAll();
     }
+    loadOpps();
+    sb.channel("oportunidades-live")
+      .on("postgres_changes", { event: "*", schema: "public", table: "oportunidades" }, () => loadOpps())
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "pesquisas" }, () => loadOpps())
+      .subscribe();
     try { await fetchAll(); }
     catch (e) { setSync("Não foi possível carregar as marcações agora. Recarregue a página mais tarde.", true); }
 
@@ -917,7 +1159,7 @@
       .subscribe();
 
     // ao voltar para a aba, recarrega para não perder nada
-    document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") fetchAll().catch(() => {}); });
+    document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") { fetchAll().catch(() => {}); loadOpps(); } });
   })();
 })();
 </script>
